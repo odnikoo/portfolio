@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tempo — Work at your tempo.</title>
+<link rel="icon" id="t-icon" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:     #080b10;
+  --bg2:    #0d1117;
+  --surf:   #13181f;
+  --surf2:  #1a2030;
+  --bdr:    rgba(255,255,255,0.06);
+  --bdr2:   rgba(255,255,255,0.11);
+  --cyan:   #38bdf8;
+  --cdim:   rgba(56,189,248,0.10);
+  --cglow:  rgba(56,189,248,0.35);
+  --amber:  #fb923c;
+  --adim:   rgba(251,146,60,0.10);
+  --green:  #34d399;
+  --red:    #f87171;
+  --text:   #f1f5f9;
+  --mid:    #94a3b8;
+  --dim:    #475569;
+  --serif:  'Fraunces',Georgia,serif;
+  --sans:   'Inter',system-ui,sans-serif;
+  --mono:   'JetBrains Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* Subtle grid */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,0.02) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  width:100%;
+  background:rgba(8,11,16,0.92);
+  border-bottom:1px solid var(--bdr);
+  padding:0.9rem 1.5rem;
+  display:flex;align-items:center;justify-content:center;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.logo{display:flex;align-items:center;gap:0.5rem;text-decoration:none;}
+.logo-mark{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,#38bdf8,#a78bfa);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-mark svg{display:block;}
+.logo-name{
+  font-family:var(--serif);
+  font-size:1.1rem;font-weight:700;
+  color:var(--text);letter-spacing:-0.01em;
+}
+.back{
+  position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);
+  font-family:var(--sans);font-size:0.72rem;color:var(--dim);
+  text-decoration:none;border:1px solid var(--bdr2);
+  padding:0.3rem 0.8rem;border-radius:20px;
+  transition:color 0.2s;
+}
+.back:hover{color:var(--cyan);}
+
+/* ── MAIN ── */
+main{
+  width:100%;max-width:520px;
+  padding:2.5rem 1.5rem 6rem;
+  flex:1;display:flex;flex-direction:column;align-items:stretch;
+  position:relative;z-index:1;
+}
+.screen{display:none;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ── SHARED ── */
+.eyebrow{
+  display:flex;align-items:center;gap:0.5rem;
+  font-family:var(--sans);font-size:0.8rem;font-weight:500;
+  margin-bottom:0.85rem;justify-content:center;
+}
+.eyebrow.c{color:var(--cyan);}
+.eyebrow.a{color:var(--amber);}
+.eyebrow.g{color:var(--green);}
+.eyebrow-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+}
+.eyebrow.c .eyebrow-dot{background:var(--cyan);animation:pulse-c 2s infinite;}
+.eyebrow.a .eyebrow-dot{background:var(--amber);}
+.eyebrow.g .eyebrow-dot{background:var(--green);}
+@keyframes pulse-c{
+  0%,100%{box-shadow:0 0 0 0 var(--cglow);}
+  50%{box-shadow:0 0 0 6px rgba(56,189,248,0);}
+}
+
+.display-h{
+  font-family:var(--serif);
+  font-size:clamp(2rem,5.5vw,2.75rem);
+  font-weight:800;letter-spacing:-0.03em;
+  line-height:1.05;color:var(--text);
+  margin-bottom:0.5rem;
+  text-align:center;
+}
+.display-h em{font-style:italic;color:var(--cyan);}
+.display-h.amber em{color:var(--amber);}
+
+/* Timer */
+.big-timer{
+  font-family:var(--mono);
+  font-size:clamp(4.5rem,15vw,6.5rem);
+  font-weight:700;letter-spacing:-0.03em;
+  line-height:1;margin-bottom:0.75rem;
+  text-align:center;
+}
+.big-timer.c{color:var(--cyan);text-shadow:0 0 40px rgba(56,189,248,0.3);}
+.big-timer.a{color:var(--amber);text-shadow:0 0 40px rgba(251,146,60,0.3);}
+
+/* Progress */
+.prog{
+  width:100%;height:3px;
+  background:var(--surf2);
+  border-radius:2px;
+  overflow:hidden;
+  margin-bottom:2.5rem;
+}
+.prog-fill{height:100%;border-radius:2px;transition:width 1s linear;width:100%;}
+.prog-fill.c{background:var(--cyan);}
+.prog-fill.a{background:var(--amber);}
+
+/* Task name on focus screen */
+.task-label{
+  font-family:var(--sans);font-size:0.88rem;
+  color:var(--dim);text-align:center;
+  margin-bottom:2rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* Buttons */
+.btns{display:flex;flex-direction:column;gap:0.5rem;width:100%;}
+.btn{
+  width:100%;padding:0.95rem 1.5rem;
+  font-family:var(--sans);font-size:0.9rem;font-weight:600;
+  border-radius:12px;cursor:pointer;border:none;
+  transition:opacity 0.18s,transform 0.12s;text-align:center;
+  letter-spacing:0.01em;
+}
+.btn:active{transform:scale(0.98);}
+.btn.primary{background:var(--cyan);color:#07090d;}
+.btn.primary:hover{opacity:0.88;}
+.btn.ghost{background:var(--surf);color:var(--mid);border:1px solid var(--bdr2);}
+.btn.ghost:hover{color:var(--text);}
+.btn.faint{background:transparent;color:var(--dim);border:1px solid var(--bdr);}
+.btn.faint:hover{color:var(--red);border-color:rgba(248,113,113,0.2);}
+.btn:disabled{opacity:0.25;cursor:not-allowed;transform:none;}
+.btn-row{display:flex;gap:0.5rem;}
+.btn-row .btn{flex:1;}
+
+/* ── SETUP ── */
+.notif-strip{
+  display:flex;align-items:center;gap:0.6rem;
+  background:var(--surf);border:1px solid var(--bdr2);
+  border-radius:10px;padding:0.65rem 0.9rem;
+  margin-bottom:1.75rem;
+  font-size:0.8rem;color:var(--dim);
+}
+.notif-strip.denied{background:rgba(248,113,113,0.06);border-color:rgba(248,113,113,0.2);color:var(--red);}
+#notif-btn{
+  margin-left:auto;background:var(--cyan);color:#07090d;
+  border:none;border-radius:20px;padding:0.22rem 0.7rem;
+  font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;
+}
+
+.setup-headline{margin-bottom:2.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;}
+.eyebrow{
+  display:flex;align-items:center;gap:0.5rem;
+  font-family:var(--sans);font-size:0.8rem;font-weight:500;
+  margin-bottom:0.85rem;justify-content:center;
+}
+/* Task card */
+.task-card{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:14px;padding:1.25rem;
+  margin-bottom:0.5rem;
+}
+.task-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;}
+.drag-dots{
+  display:grid;grid-template-columns:repeat(2,3.5px);gap:3px;
+  flex-shrink:0;cursor:grab;touch-action:none;
+  padding:2px;
+}
+.drag-dots span{width:3.5px;height:3.5px;border-radius:50%;background:var(--dim);}
+.drag-dots:active{cursor:grabbing;}
+.task-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--cdim);color:var(--cyan);
+  font-family:var(--mono);font-size:0.62rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.task-inp{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--sans);font-size:0.9rem;color:var(--text);
+}
+.task-inp::placeholder{color:var(--dim);}
+.task-del{
+  background:none;border:none;color:var(--dim);
+  cursor:pointer;font-size:1rem;padding:0.15rem 0.3rem;
+  border-radius:4px;transition:color 0.15s;flex-shrink:0;
+}
+.task-del:hover{color:var(--red);}
+.focus-pills{display:flex;align-items:center;gap:0.4rem;padding-left:1.9rem;}
+.flbl{font-size:0.7rem;color:var(--dim);margin-right:0.2rem;}
+.fpill{
+  font-size:0.72rem;font-weight:500;padding:0.2rem 0.6rem;
+  border-radius:20px;border:1px solid var(--bdr2);
+  background:transparent;color:var(--mid);cursor:pointer;transition:all 0.15s;
+}
+.fpill.on{background:var(--cdim);border-color:rgba(56,189,248,0.3);color:var(--cyan);}
+.fpill:hover:not(.on){color:var(--text);}
+
+.task-card.dragging{opacity:0.3;}
+.task-card.drag-over{border-color:rgba(56,189,248,0.4);background:var(--cdim);}
+
+.add-task-btn{
+  width:100%;background:transparent;
+  border:1px dashed var(--bdr2);border-radius:12px;
+  padding:0.8rem;font-family:var(--sans);font-size:0.85rem;color:var(--dim);
+  cursor:pointer;transition:all 0.18s;
+  display:flex;align-items:center;justify-content:center;gap:0.4rem;
+  margin-bottom:1.5rem;
+}
+.add-task-btn:hover:not(:disabled){border-color:rgba(56,189,248,0.3);color:var(--cyan);}
+.add-task-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* Break config row */
+.config-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.25rem;
+}
+.config-label{font-size:0.8rem;color:var(--dim);font-weight:500;}
+.config-pills{display:flex;gap:0.4rem;}
+.bpill{
+  flex:1;padding:0.9rem;border-radius:14px;
+  border:1px solid var(--bdr2);background:var(--surf2);
+  font-family:var(--serif);font-size:1.2rem;font-weight:700;
+  color:var(--mid);cursor:pointer;transition:all 0.15s;text-align:center;
+}
+.bpill.on{background:var(--adim);border-color:rgba(251,146,60,0.3);color:var(--amber);}
+.bpill:hover:not(.on){color:var(--text);}
+
+/* ── FOCUS SCREEN ── */
+.focus-wrap{display:flex;flex-direction:column;align-items:center;}
+.focus-ctrls{
+  display:flex;flex-direction:column;gap:0.45rem;
+  width:100%;max-width:360px;
+}
+.focus-ctrls-row{display:flex;gap:0.45rem;}
+.focus-ctrls-row .btn{flex:1;}
+
+/* Task panel */
+.task-panel{
+  width:100%;background:var(--bg2);
+  border:1px solid var(--bdr);border-radius:14px;
+  overflow:hidden;margin-top:2rem;
+}
+.task-panel-head{
+  padding:0.8rem 1rem;
+  border-bottom:1px solid var(--bdr);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.tph-l{font-size:0.8rem;font-weight:600;color:var(--dim);}
+.tph-r{font-family:var(--mono);font-size:0.75rem;color:var(--cyan);}
+.tpanel-items{display:flex;flex-wrap:wrap;}
+.tpanel-item{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.8rem 1rem;
+  border-right:1px solid var(--bdr);
+  border-bottom:1px solid var(--bdr);
+  flex:1;min-width:140px;transition:background 0.15s;
+}
+.tpanel-item.cur{background:var(--cdim);}
+.tpanel-item.done{opacity:0.3;}
+.tpdot{
+  width:7px;height:7px;border-radius:50%;
+  border:1.5px solid var(--dim);flex-shrink:0;
+}
+.tpanel-item.cur .tpdot{
+  border-color:var(--cyan);background:var(--cyan);
+  animation:throb 1.5s infinite;
+}
+.tpanel-item.done .tpdot{border-color:var(--green);background:var(--green);}
+@keyframes throb{
+  0%,100%{box-shadow:0 0 0 0 var(--cglow);}
+  50%{box-shadow:0 0 0 4px rgba(56,189,248,0);}
+}
+.tpname{font-size:0.85rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.tpanel-item.done .tpname{text-decoration:line-through;color:var(--dim);}
+.tpmins{font-family:var(--mono);font-size:0.7rem;color:var(--dim);flex-shrink:0;}
+.tpanel-item.cur .tpmins{color:var(--cyan);}
+
+/* ── BREAK ── */
+.break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1rem;}
+.break-acts-label{
+  font-size:0.78rem;color:var(--dim);
+  margin-bottom:1rem;letter-spacing:0.04em;
+}
+.act-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0.5rem;width:100%;margin-bottom:2rem;
+}
+.act-card{
+  background:var(--surf);border:1px solid var(--bdr2);
+  border-radius:12px;padding:0.9rem 0.75rem;
+  cursor:pointer;transition:all 0.18s;
+  display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+  text-align:center;
+}
+.act-card:hover{border-color:rgba(251,146,60,0.3);}
+.act-card.picked{border-color:var(--amber);background:var(--adim);}
+.act-card.dimmed{opacity:0.3;}
+.act-emoji{font-size:1.4rem;line-height:1;}
+.act-text{font-size:0.78rem;color:var(--mid);font-weight:500;line-height:1.35;}
+.act-card.picked .act-text{color:var(--amber);}
+
+.skip-section{display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:300px;}
+.skip-btn{
+  width:100%;padding:0.7rem;border-radius:12px;
+  border:1px solid var(--bdr2);background:var(--surf);
+  font-family:var(--sans);font-size:0.82rem;color:var(--dim);
+  cursor:pointer;transition:all 0.18s;
+}
+.skip-btn:not(:disabled):hover{color:var(--amber);border-color:rgba(251,146,60,0.25);}
+.skip-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* ── CHECK-IN ── */
+.checkin-wrap{
+  display:flex;flex-direction:column;
+  align-items:center;text-align:center;
+  padding-top:2rem;
+}
+.checkin-activity{
+  font-family:var(--serif);
+  font-size:clamp(1.8rem,5vw,2.5rem);
+  font-weight:800;letter-spacing:-0.03em;
+  line-height:1.1;color:var(--amber);
+  margin-bottom:2.5rem;
+  max-width:400px;
+}
+.checkin-activity.generic{color:var(--text);}
+
+/* ── COMPLETE ── */
+.stats{
+  display:flex;gap:0;width:100%;
+  border:1px solid var(--bdr);border-radius:14px;
+  overflow:hidden;background:var(--surf);
+  margin-bottom:2rem;
+}
+.stat{flex:1;padding:1.5rem 1rem;border-right:1px solid var(--bdr);text-align:center;}
+.stat:last-child{border-right:none;}
+.stat-n{
+  font-family:var(--mono);font-size:2rem;font-weight:700;
+  line-height:1;margin-bottom:0.35rem;
+}
+.stat-n.c{color:var(--cyan);}
+.stat-n.a{color:var(--amber);}
+.stat-l{font-size:0.68rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade{animation:fadeUp 0.35s ease forwards;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .big-timer{font-size:4rem;}
+  .tpanel-item{min-width:100%;border-right:none;}
+  .stats{flex-direction:column;}
+  .stat{border-right:none;border-bottom:1px solid var(--bdr);}
+  .stat:last-child{border-bottom:none;}
+}
+@media(max-width:360px){
+  main{padding:1.5rem 1rem 5rem;}
+  .big-timer{font-size:3.5rem;}
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg width="14" height="17" viewBox="0 0 14 17" fill="none">
+        <rect x="1" y="1" width="5" height="13" rx="2.5" fill="#07090d"/>
+        <rect x="8" y="1" width="5" height="13" rx="2.5" fill="#07090d"/>
+        <circle cx="7" cy="16" r="1.8" fill="#07090d" opacity="0.5"/>
+      </svg>
+    </div>
+    <span class="logo-name">Tempo</span>
+  </a>
+  <a class="back" href="/">← odniko.com</a>
+</header>
+
+<main>
+
+<!-- ══ SETUP ══ -->
+<div class="screen active" id="s-setup">
+
+  <!-- Only show when blocked -->
+  <div id="notif-strip" style="display:none;" class="notif-strip">
+    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+    <span id="notif-msg">Enable notifications</span>
+    <button id="notif-btn" onclick="reqNotif()">Enable</button>
+  </div>
+
+  <div class="setup-headline">
+    <div class="eyebrow c">
+      <span class="eyebrow-dot"></span>
+      Work at your tempo.
+    </div>
+    <h1 class="display-h">What are we<br>getting <em>done today?</em></h1>
+  </div>
+
+  <!-- Tasks -->
+  <div id="task-list"></div>
+  <button class="add-task-btn" id="add-btn" onclick="addTask()">+ Add task</button>
+
+  <!-- Break config -->
+  <p style="font-size:0.7rem;font-weight:600;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;">Break length</p>
+  <div style="display:flex;gap:0.6rem;margin-bottom:1.5rem;">
+    <button class="bpill on" onclick="setBreak(5,this)">5</button>
+    <button class="bpill" onclick="setBreak(10,this)">10</button>
+    <button class="bpill" onclick="setBreak(15,this)">15</button>
+  </div>
+
+  <button class="btn primary" id="go-btn" onclick="startSession()" disabled>Let's go</button>
+</div>
+
+<!-- ══ FOCUS ══ -->
+<div class="screen" id="s-focus">
+  <div class="focus-wrap" style="padding-top:1.5rem;">
+    <div class="eyebrow c">
+      <span class="eyebrow-dot"></span>
+      Focusing
+    </div>
+    <div class="big-timer c" id="f-timer">25 : 00</div>
+    <div class="prog"><div class="prog-fill c" id="f-prog"></div></div>
+    <p class="task-label" id="f-label"></p>
+
+    <div class="focus-ctrls">
+      <div class="focus-ctrls-row">
+        <button class="btn primary" id="pause-btn" onclick="togglePause()">Pause</button>
+        <button class="btn ghost" onclick="addMin()">+1 min</button>
+        <button class="btn ghost" onclick="doneEarly()">Done early</button>
+      </div>
+      <button class="btn ghost" onclick="goBack()">← Add more tasks</button>
+      <button class="btn faint" onclick="confirmReset()">↩ Reset</button>
+    </div>
+
+    <div class="task-panel">
+      <div class="task-panel-head">
+        <span class="tph-l">Tasks</span>
+        <span class="tph-r" id="f-count">0/0</span>
+      </div>
+      <div class="tpanel-items" id="f-tasks"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BREAK ══ -->
+<div class="screen" id="s-break">
+  <div class="break-wrap">
+    <div class="eyebrow a" style="justify-content:center;">
+      <span class="eyebrow-dot"></span>
+      Pause.
+    </div>
+    <h2 class="display-h amber" style="text-align:center;margin-bottom:0.5rem;">
+      Good work.<br><em>Take a breather.</em>
+    </h2>
+    <div class="big-timer a" id="b-timer">05 : 00</div>
+    <div class="prog"><div class="prog-fill a" id="b-prog"></div></div>
+    <div class="act-grid" id="break-acts"></div>
+    <div class="skip-section">
+      <button class="skip-btn" id="skip-btn" onclick="skipBreak()" disabled>Skip (available in 2:00)</button>
+      <button class="btn faint" onclick="confirmReset()" style="font-size:0.8rem;padding:0.6rem;">↩ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECK-IN ══ -->
+<div class="screen" id="s-checkin">
+  <div class="checkin-wrap fade">
+    <div class="eyebrow a" style="justify-content:center;">
+      <span class="eyebrow-dot"></span>
+      ♩ Check in
+    </div>
+    <div class="checkin-activity" id="ci-text">How was the rest?</div>
+    <div class="btns" style="max-width:300px;width:100%;">
+      <button class="btn primary" id="ci-yes" onclick="selectCheckIn(true)">✓ Did it</button>
+      <button class="btn ghost" id="ci-no" onclick="selectCheckIn(false)">Nope</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPLETE ══ -->
+<div class="screen" id="s-done">
+  <div class="fade" style="padding-top:1.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;">
+    <div class="eyebrow g">
+      <span class="eyebrow-dot"></span>
+      Session complete
+    </div>
+    <h2 class="display-h" style="margin-bottom:0.5rem;"><em>Well done.</em></h2>
+    <p style="font-size:0.88rem;color:var(--dim);margin-bottom:2rem;text-align:center;" id="done-sub"></p>
+    <div class="stats">
+      <div class="stat"><div class="stat-n c" id="ds-t">0</div><div class="stat-l">Done</div></div>
+      <div class="stat"><div class="stat-n c" id="ds-m">0</div><div class="stat-l">Minutes</div></div>
+      <div class="stat"><div class="stat-n a" id="ds-h">0</div><div class="stat-l">Honest</div></div>
+      <div class="stat"><div class="stat-n c" id="ds-s">0</div><div class="stat-l">Streak</div></div>
+    </div>
+    <button class="btn primary" onclick="resetAll()">Start a new session</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── FAVICON ──
+(function(){
+  const c=document.createElement('canvas');c.width=64;c.height=64;
+  const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,64,64);
+  g.addColorStop(0,'#38bdf8');g.addColorStop(1,'#a78bfa');
+  x.fillStyle=g;x.beginPath();x.roundRect(0,0,64,64,14);x.fill();
+  x.fillStyle='#07090d';
+  x.beginPath();x.roundRect(14,12,14,34,6);x.fill();
+  x.beginPath();x.roundRect(36,12,14,34,6);x.fill();
+  x.globalAlpha=0.5;x.beginPath();x.arc(32,56,5,0,Math.PI*2);x.fill();
+  x.globalAlpha=1;
+  document.getElementById('t-icon').href=c.toDataURL('image/png');
+})();
+
+// ── NOTIFICATIONS ──
+function checkNotif(){
+  const strip=document.getElementById('notif-strip');
+  const msg=document.getElementById('notif-msg');
+  if(!('Notification' in window)){strip.style.display='none';return;}
+  if(Notification.permission==='granted'){
+    strip.style.display='none'; // hide when on — don't celebrate obvious
+  } else if(Notification.permission==='denied'){
+    strip.style.display='flex';strip.className='notif-strip denied';
+    msg.textContent='Notifications blocked — re-enable in browser settings';
+    document.getElementById('notif-btn').style.display='none';
+  } else {
+    strip.style.display='flex'; // show prompt only when pending
+    msg.textContent='Enable notifications to get nudged when time\'s up';
+  }
+}
+function reqNotif(){Notification.requestPermission().then(()=>checkNotif());}
+function notify(t,b){if('Notification' in window&&Notification.permission==='granted')new Notification(t,{body:b});}
+
+// ── AUDIO ──
+let aCtx=null;
+function unlockAudio(){
+  if(!aCtx){
+    aCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const b=aCtx.createBuffer(1,1,22050),s=aCtx.createBufferSource();
+    s.buffer=b;s.connect(aCtx.destination);s.start(0);
+  }
+  if(aCtx.state==='suspended')aCtx.resume();
+}
+document.addEventListener('touchstart',unlockAudio,{once:true});
+document.addEventListener('click',unlockAudio,{once:true});
+function chime(hi=false){
+  try{
+    if(!aCtx)aCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(aCtx.state==='suspended')aCtx.resume();
+    const ctx=aCtx;
+    (hi?[659,784,1047]:[523,659,784]).forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
+      const t=ctx.currentTime+i*0.22;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.18,t+0.06);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.7);
+      o.start(t);o.stop(t+0.75);
+    });
+  }catch(e){}
+}
+
+// ── ACTIVITIES ──
+const ACTS=[
+  {e:'💪',t:'10 squats'},{e:'🚶',t:'Walk 2 minutes'},
+  {e:'🧘',t:'Eyes closed, breathe'},{e:'💧',t:'Full glass of water'},
+  {e:'☕',t:'Make a warm drink'},{e:'🌬️',t:'5 deep breaths'},
+  {e:'🤸',t:'Roll your shoulders'},{e:'🚪',t:'Step outside, 60 sec'},
+  {e:'🧼',t:'Splash cold water'},{e:'🎵',t:'Listen to one song'},
+  {e:'👁️',t:'Look far away'},{e:'📱',t:'Text someone nice'},
+  {e:'😴',t:'Rest your eyes'},{e:'🏃',t:'5 jumping jacks'},
+  {e:'🌿',t:'Sit in silence'},{e:'🤲',t:'Stretch your wrists'},
+];
+const UNHINGED=[
+  {e:'😱',t:'Scream into a pillow'},{e:'🕺',t:'Robot dance, now'},
+  {e:'🪞',t:'Compliment yourself'},{e:'🫠',t:'Stare at ceiling'},
+  {e:'💃',t:'Dance, full send'},{e:'😤',t:'Power pose, 30 sec'},
+  {e:'👀',t:'Find 5 blue things'},{e:'🫂',t:'Hug yourself'},
+  {e:'🐟',t:'Flop on the floor'},{e:'🤌',t:'Narrate life in accent'},
+];
+let selectedActivity=null;
+function getActs(){
+  const normal=[...ACTS].sort(()=>Math.random()-0.5).slice(0,3);
+  const wild=UNHINGED[Math.floor(Math.random()*UNHINGED.length)];
+  const all=[...normal];all.splice(Math.floor(Math.random()*4),0,wild);
+  return all.slice(0,4);
+}
+function renderActs(){
+  selectedActivity=null;
+  document.getElementById('break-acts').innerHTML=getActs().map((a,i)=>`
+    <div class="act-card" id="act-${i}" onclick="pickAct(${i},'${a.t}')">
+      <span class="act-emoji">${a.e}</span>
+      <span class="act-text">${a.t}</span>
+    </div>`).join('');
+}
+function pickAct(i,t){
+  document.querySelectorAll('.act-card').forEach((c,j)=>{
+    c.classList.toggle('picked',j===i);
+    c.classList.toggle('dimmed',j!==i);
+  });
+  selectedActivity=t;
+}
+
+// ── DRAG & DROP ──
+let dragIdx=null;
+function onDragStart(e,i){
+  dragIdx=i;e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>document.querySelectorAll('.task-card')[i]?.classList.add('dragging'),0);
+}
+function onDragOver(e,i){
+  e.preventDefault();
+  document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.task-card')[i]?.classList.add('drag-over');
+}
+function onDrop(e,i){
+  e.preventDefault();
+  document.querySelectorAll('.task-card').forEach(c=>{c.classList.remove('drag-over');c.classList.remove('dragging');});
+  if(dragIdx===null||dragIdx===i){dragIdx=null;return;}
+  const d=tasks.splice(dragIdx,1)[0];tasks.splice(i,0,d);
+  dragIdx=null;renderTasks();updateGoBtn();
+}
+function onDragEnd(){
+  document.querySelectorAll('.task-card').forEach(c=>{c.classList.remove('drag-over');c.classList.remove('dragging');});
+  dragIdx=null;
+}
+// Touch drag
+let tDragIdx=null,tClone=null,tEl=null,tOffY=0;
+function onTouchStart(e,i){
+  e.stopPropagation();tDragIdx=i;
+  tEl=e.currentTarget.closest('.task-card');
+  const r=tEl.getBoundingClientRect();tOffY=e.touches[0].clientY-r.top;
+  tClone=tEl.cloneNode(true);
+  tClone.style.cssText=`position:fixed;left:${r.left}px;width:${r.width}px;opacity:0.85;z-index:999;pointer-events:none;border-radius:14px;background:var(--surf);border:1px solid rgba(56,189,248,0.4);`;
+  document.body.appendChild(tClone);tEl.style.opacity='0.3';
+}
+function onTouchMove(e){
+  if(!tClone)return;e.preventDefault();
+  tClone.style.top=(e.touches[0].clientY-tOffY)+'px';
+  document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('drag-over'));
+  document.querySelectorAll('.task-card').forEach((c,i)=>{
+    const r=c.getBoundingClientRect();
+    if(e.touches[0].clientY>=r.top&&e.touches[0].clientY<=r.bottom&&i!==tDragIdx)c.classList.add('drag-over');
+  });
+}
+function onTouchEnd(e){
+  if(tDragIdx===null)return;
+  if(tClone){document.body.removeChild(tClone);tClone=null;}
+  if(tEl){tEl.style.opacity='1';tEl=null;}
+  let target=tDragIdx;
+  document.querySelectorAll('.task-card').forEach((c,i)=>{
+    if(c.classList.contains('drag-over'))target=i;
+    c.classList.remove('drag-over');
+  });
+  if(target!==tDragIdx){
+    const d=tasks.splice(tDragIdx,1)[0];tasks.splice(target,0,d);
+    renderTasks();updateGoBtn();
+  }
+  tDragIdx=null;
+}
+
+// ── STATE ──
+let tasks=[],breakMins=5,taskIdx=0,secsLeft=0,totalSecs=0;
+let tmr=null,skipTmr=null,paused=false,done=0,focMin=0,honest=0,streak=0,maxStreak=0;
+
+function addTask(){
+  if(tasks.length>=5)return;
+  tasks.push({id:Date.now(),name:'',focus:25});
+  renderTasks();updateGoBtn();
+  setTimeout(()=>{const ins=document.querySelectorAll('.task-inp');if(ins.length)ins[ins.length-1].focus();},50);
+}
+function removeTask(id){tasks=tasks.filter(t=>t.id!==id);renderTasks();updateGoBtn();}
+function setName(id,v){const t=tasks.find(t=>t.id===id);if(t)t.name=v.trim();updateGoBtn();}
+function setFocus(id,m,btn){
+  const t=tasks.find(t=>t.id===id);if(t)t.focus=m;
+  btn.closest('.focus-pills').querySelectorAll('.fpill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');updateGoBtn();
+}
+function setBreak(m,btn){
+  breakMins=m;
+  btn.parentElement.querySelectorAll('.bpill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function renderTasks(){
+  const inSession=taskIdx>0||(secsLeft>0&&secsLeft<totalSecs);
+  document.getElementById('task-list').innerHTML=tasks.map((t,i)=>{
+    if(i<taskIdx){
+      return `<div class="task-card" style="opacity:0.35;margin-bottom:0.5rem;">
+        <div class="task-row">
+          <span style="color:var(--green);font-size:0.8rem;">✓</span>
+          <span style="flex:1;font-size:0.88rem;color:var(--text);text-decoration:line-through;padding-left:0.25rem;">${t.name}</span>
+          <span style="font-family:var(--mono);font-size:0.7rem;color:var(--dim);">${t.focus}m</span>
+        </div>
+      </div>`;
+    }
+    if(i===taskIdx&&inSession){
+      return `<div class="task-card" style="border-color:rgba(56,189,248,0.3);background:var(--cdim);margin-bottom:0.5rem;">
+        <div class="task-row">
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--cyan);flex-shrink:0;">NOW</span>
+          <span style="flex:1;font-size:0.88rem;color:var(--text);padding-left:0.5rem;">${t.name}</span>
+          <span style="font-family:var(--mono);font-size:0.72rem;color:var(--cyan);">${fmt(secsLeft)} left</span>
+        </div>
+      </div>`;
+    }
+    return `<div class="task-card fade" draggable="true"
+      ondragstart="onDragStart(event,${i})" ondragover="onDragOver(event,${i})"
+      ondrop="onDrop(event,${i})" ondragend="onDragEnd()" style="margin-bottom:0.5rem;">
+      <div class="task-row">
+        <div class="drag-dots" ontouchstart="onTouchStart(event,${i})" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span class="task-num">${String(i+1).padStart(2,'0')}</span>
+        <input class="task-inp" type="text" placeholder="What's the task?" value="${t.name}"
+          oninput="setName(${t.id},this.value)" maxlength="60">
+        <button class="task-del" onclick="removeTask(${t.id})">×</button>
+      </div>
+      <div class="focus-pills">
+        <span class="flbl">Focus</span>
+        <button class="fpill ${t.focus===15?'on':''}" onclick="setFocus(${t.id},15,this)">15m</button>
+        <button class="fpill ${t.focus===25?'on':''}" onclick="setFocus(${t.id},25,this)">25m</button>
+        <button class="fpill ${t.focus===45?'on':''}" onclick="setFocus(${t.id},45,this)">45m</button>
+      </div>
+    </div>`;
+  }).join('');
+  const ab=document.getElementById('add-btn');
+  ab.disabled=tasks.length>=5;
+  ab.textContent=tasks.length>=5?'Max 5 tasks':'+ Add task';
+}
+
+function updateGoBtn(){
+  const valid=tasks.filter(t=>t.name.length>0);
+  const btn=document.getElementById('go-btn');
+  btn.disabled=valid.length===0;
+  if(valid.length){
+    const tot=valid.reduce((s,t)=>s+(t.focus||0),0);
+    btn.textContent=`Let's go · ${tot} min`;
+  } else btn.textContent="Let's go";
+}
+
+// ── SESSION ──
+function startSession(){
+  tasks=tasks.filter(t=>t.name.length>0);
+  if(!tasks.length)return;
+  taskIdx=0;done=0;focMin=0;honest=0;streak=0;maxStreak=0;
+  document.getElementById('go-btn').onclick=startSession;
+  show('s-focus');startFocus();
+}
+
+function startFocus(){
+  paused=false;
+  const task=tasks[taskIdx];
+  document.getElementById('pause-btn').textContent='Pause';
+  document.getElementById('f-label').textContent=task.name;
+  totalSecs=task.focus*60;secsLeft=totalSecs;focMin+=task.focus;
+  document.getElementById('f-prog').style.width='100%';
+  updateFocusUI();renderPanel();
+  clearInterval(tmr);
+  tmr=setInterval(()=>{
+    if(!paused){secsLeft--;updateFocusUI();}
+    if(secsLeft<=0){clearInterval(tmr);chime(false);notify('Done ✓',`"${task.name}" — time to rest.`);finishTask();}
+  },1000);
+}
+
+function startBreak(){
+  show('s-break');
+  renderActs();
+  totalSecs=breakMins*60;secsLeft=totalSecs;
+  document.getElementById('b-prog').style.width='100%';
+  let ss=Math.min(120,breakMins*60);
+  const sb=document.getElementById('skip-btn');
+  sb.disabled=true;sb.textContent=`Skip (available in ${fmt(ss)})`;
+  clearInterval(skipTmr);
+  skipTmr=setInterval(()=>{
+    ss--;
+    if(ss<=0){clearInterval(skipTmr);sb.disabled=false;sb.textContent='Skip rest →';}
+    else sb.textContent=`Skip (available in ${fmt(ss)})`;
+  },1000);
+  clearInterval(tmr);
+  tmr=setInterval(()=>{
+    secsLeft--;
+    document.getElementById('b-timer').textContent=fmtS(secsLeft);
+    document.getElementById('b-prog').style.width=`${(secsLeft/totalSecs)*100}%`;
+    if(secsLeft<=0){clearInterval(tmr);clearInterval(skipTmr);chime(true);notify('Rest over','How was it?');showCheckIn();}
+  },1000);
+}
+
+function finishTask(){done++;taskIdx++;if(taskIdx>=tasks.length)showDone();else startBreak();}
+
+function updateFocusUI(){
+  document.getElementById('f-timer').textContent=fmtS(secsLeft);
+  document.getElementById('f-prog').style.width=`${(secsLeft/totalSecs)*100}%`;
+  renderPanel();
+}
+
+function renderPanel(){
+  document.getElementById('f-count').textContent=`${done}/${tasks.length}`;
+  document.getElementById('f-tasks').innerHTML=tasks.map((t,i)=>`
+    <div class="tpanel-item ${i<taskIdx?'done':''} ${i===taskIdx?'cur':''}">
+      <div class="tpdot"></div>
+      <span class="tpname">${t.name}</span>
+      <span class="tpmins">${t.focus}m</span>
+    </div>`).join('');
+}
+
+function showCheckIn(){
+  show('s-checkin');
+  const txt=document.getElementById('ci-text');
+  if(selectedActivity){
+    txt.className='checkin-activity';
+    txt.textContent=selectedActivity+'?';
+  } else {
+    txt.className='checkin-activity generic';
+    txt.textContent='How was the rest?';
+  }
+  document.getElementById('ci-yes').textContent=selectedActivity?'✓ Did it':'✓ Stayed off';
+  document.getElementById('ci-no').textContent='Nope';
+}
+
+function selectCheckIn(ok){
+  if(ok){honest++;streak++;maxStreak=Math.max(maxStreak,streak);}
+  else{streak=0;}
+  show('s-focus');startFocus();
+}
+
+function togglePause(){paused=!paused;document.getElementById('pause-btn').textContent=paused?'Resume':'Pause';}
+function addMin(){secsLeft+=60;totalSecs+=60;updateFocusUI();}
+function doneEarly(){clearInterval(tmr);chime(false);finishTask();}
+function skipBreak(){clearInterval(tmr);clearInterval(skipTmr);showCheckIn();}
+
+function goBack(){
+  clearInterval(tmr);clearInterval(skipTmr);paused=true;
+  const btn=document.getElementById('go-btn');
+  btn.textContent='Resume session →';btn.disabled=false;
+  btn.onclick=resumeSession;
+  renderTasks();show('s-setup');
+}
+function resumeSession(){
+  const btn=document.getElementById('go-btn');
+  btn.onclick=startSession;
+  show('s-focus');paused=false;
+  document.getElementById('pause-btn').textContent='Pause';
+  document.getElementById('f-label').textContent=tasks[taskIdx].name;
+  updateFocusUI();renderPanel();
+  clearInterval(tmr);
+  const task=tasks[taskIdx];
+  tmr=setInterval(()=>{
+    if(!paused){secsLeft--;updateFocusUI();}
+    if(secsLeft<=0){clearInterval(tmr);chime(false);notify('Done ✓',`"${task.name}" — time to rest.`);finishTask();}
+  },1000);
+}
+
+function confirmReset(){if(confirm('Reset everything?'))resetAll();}
+function showDone(){
+  clearInterval(tmr);clearInterval(skipTmr);show('s-done');
+  document.getElementById('ds-t').textContent=done;
+  document.getElementById('ds-m').textContent=focMin;
+  document.getElementById('ds-h').textContent=honest;
+  document.getElementById('ds-s').textContent=maxStreak;
+  const msg=honest===Math.max(done-1,0)&&done>1?'Perfect. Every rest counted.':honest===0&&done>1?'Tomorrow — one honest rest.':'You earned it.';
+  document.getElementById('done-sub').textContent=`${done} task${done!==1?'s':''} done. ${focMin} min focused. ${msg}`;
+  chime(true);notify('Session complete','Well done.');
+}
+function resetAll(){
+  clearInterval(tmr);clearInterval(skipTmr);
+  tasks=[];taskIdx=0;done=0;focMin=0;honest=0;streak=0;maxStreak=0;paused=false;secsLeft=0;totalSecs=0;selectedActivity=null;
+  const btn=document.getElementById('go-btn');btn.onclick=startSession;btn.textContent="Let's go";btn.disabled=true;
+  renderTasks();updateGoBtn();show('s-setup');
+}
+
+function fmt(s){s=Math.max(0,s);return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+function fmtS(s){s=Math.max(0,s);return `${String(Math.floor(s/60)).padStart(2,'0')} : ${String(s%60).padStart(2,'0')}`;}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);el.classList.add('active','fade');
+  setTimeout(()=>el.classList.remove('fade'),400);
+}
+
+checkNotif();addTask();
+</script>
+</body>
+</html>

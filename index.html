@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odniko — PM</title>
+<link rel="icon" id="portfolio-favicon" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #080b10;
+  --bg2:       #0d1117;
+  --bg3:       #111820;
+  --surface:   #161d27;
+  --surface2:  #1c2535;
+  --border:    rgba(99,179,255,0.10);
+  --border2:   rgba(99,179,255,0.18);
+  --cyan:      #38bdf8;
+  --cyan-dim:  rgba(56,189,248,0.10);
+  --cyan-glow: rgba(56,189,248,0.35);
+  --green:     #34d399;
+  --green-dim: rgba(52,211,153,0.10);
+  --purple:    #a78bfa;
+  --purple-dim:rgba(167,139,250,0.10);
+  --text:      #e2e8f0;
+  --text-mid:  #94a3b8;
+  --text-dim:  #475569;
+  --white:     #ffffff;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Space Grotesk', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* GRID BG */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4rem;
+  height: 60px;
+  background: rgba(8,11,16,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--cyan);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.nav-logo span { color: var(--text-mid); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: 0.05em;
+}
+.nav-links a::before { content: '// '; color: var(--text-dim); }
+.nav-links a:hover { color: var(--cyan); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 4rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--cyan);
+  letter-spacing: 0.12em;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 6px var(--cyan-glow); }
+  50%      { box-shadow: 0 0 18px var(--cyan-glow); opacity: 0.6; }
+}
+h1 {
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+.grad {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-mid);
+  max-width: 580px;
+  line-height: 1.85;
+  margin-bottom: 2.75rem;
+}
+.hero-cta { display: flex; gap: 1rem; align-items: center; }
+.btn-primary {
+  background: var(--cyan);
+  color: var(--bg);
+  padding: 0.75rem 1.75rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-ghost {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  padding: 0.75rem 1.75rem;
+  border-radius: 4px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+.hero-stats {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 4.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.stat { display: flex; flex-direction: column; gap: 0.2rem; }
+.stat-num {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+.stat-num .u { color: var(--cyan); }
+.stat-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* CURSOR */
+.cursor {
+  display: inline-block;
+  width: 3px; height: 0.9em;
+  background: var(--cyan);
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* SECTIONS */
+section { padding: 7rem 4rem; position: relative; z-index: 1; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.mono-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.mono-label::before { content: '// '; color: var(--text-dim); }
+h2 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 3rem;
+}
+
+/* ABOUT */
+.about-bg { background: var(--bg2); }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 5rem;
+  align-items: start;
+}
+.about-body { font-size: 1rem; color: var(--text-mid); line-height: 1.9; }
+.about-body p + p { margin-top: 1.25rem; }
+.skills-title {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--cyan);
+  background: var(--cyan-dim);
+  border: 1px solid rgba(56,189,248,0.18);
+  padding: 0.28rem 0.7rem;
+  border-radius: 3px;
+}
+.chip.g { color: var(--green); background: var(--green-dim); border-color: rgba(52,211,153,0.18); }
+.chip.p { color: var(--purple); background: var(--purple-dim); border-color: rgba(167,139,250,0.18); }
+
+/* EXPERIENCE */
+.exp-bg { background: var(--bg); }
+.exp-list { display: flex; flex-direction: column; }
+.exp-item {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 3rem;
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+}
+.exp-item:last-child { border-bottom: 1px solid var(--border); }
+.exp-period {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+.exp-company { font-size: 0.95rem; font-weight: 600; color: var(--white); margin-bottom: 0.2rem; }
+.exp-location { font-family: var(--mono); font-size: 0.68rem; color: var(--text-dim); }
+.exp-role {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+}
+.exp-bullets { list-style: none; }
+.exp-bullets li {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  padding: 0.22rem 0 0.22rem 1.4rem;
+  position: relative;
+  line-height: 1.7;
+}
+.exp-bullets li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--cyan);
+  font-size: 0.68rem;
+  top: 0.44rem;
+}
+.tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.9rem; }
+.tag {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+/* IMPACT */
+.impact-bg { background: var(--bg3); }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.card {
+  background: var(--surface);
+  padding: 2rem;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card.c1::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+.card.c2::before { background: linear-gradient(90deg, var(--green), transparent); }
+.card.c3::before { background: linear-gradient(90deg, var(--purple), transparent); }
+.card:hover { background: var(--surface2); }
+.card:hover::before { opacity: 1; }
+.card-num {
+  font-family: var(--mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.card-num.c { color: var(--cyan); }
+.card-num.g { color: var(--green); }
+.card-num.p { color: var(--purple); }
+.card-title { font-size: 0.9rem; font-weight: 600; color: var(--white); margin-bottom: 0.5rem; }
+.card-body { font-size: 0.8rem; color: var(--text-dim); line-height: 1.7; }
+
+/* EDUCATION */
+.edu-bg { background: var(--bg2); }
+.edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.edu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.edu-card::after {
+  content: '';
+  position: absolute;
+  bottom: -50px; right: -50px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(56,189,248,0.05);
+  filter: blur(24px);
+}
+.edu-degree { font-size: 1rem; font-weight: 600; color: var(--white); line-height: 1.4; margin-bottom: 0.5rem; }
+.edu-school { font-family: var(--mono); font-size: 0.76rem; color: var(--cyan); margin-bottom: 0.25rem; }
+.edu-loc { font-family: var(--mono); font-size: 0.68rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.edu-gpa {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.gpa-num { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; color: var(--green); }
+.gpa-label { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); }
+
+/* CONTACT */
+.contact-bg { background: var(--bg); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.contact-quote {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  line-height: 1.85;
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 2px solid var(--cyan);
+  background: var(--cyan-dim);
+  border-radius: 0 4px 4px 0;
+}
+.contact-links { display: flex; flex-direction: column; gap: 0.85rem; }
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: var(--text-mid);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.contact-link:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+.ci { font-size: 1rem; width: 20px; text-align: center; color: var(--cyan); }
+
+/* FOOTER */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 2rem 4rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+footer span { color: var(--cyan); }
+
+/* FADE */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+.d1 { animation-delay: 0.1s; }
+.d2 { animation-delay: 0.25s; }
+.d3 { animation-delay: 0.4s; }
+.d4 { animation-delay: 0.55s; }
+.d5 { animation-delay: 0.7s; }
+
+/* CASE STUDIES */
+.cs-bg { background: var(--bg); }
+.cs-list { display: flex; flex-direction: column; gap: 5rem; }
+
+.cs-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color 0.3s;
+}
+.cs-card:hover { border-color: var(--border2); }
+
+.cs-header {
+  padding: 2.5rem 3rem;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 2rem;
+}
+.cs-num {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+.cs-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+.cs-subtitle {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--cyan);
+}
+.cs-meta { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end; }
+.cs-badge {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.cs-badge.cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(56,189,248,0.2); }
+.cs-badge.green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+.cs-badge.purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+
+.cs-body { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.cs-col {
+  padding: 2rem 2.5rem;
+  border-right: 1px solid var(--border);
+}
+.cs-col:last-child { border-right: none; }
+.cs-col-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cs-col-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.col-problem .cs-col-label::before { background: #f87171; }
+.col-approach .cs-col-label::before { background: var(--cyan); }
+.col-outcome .cs-col-label::before { background: var(--green); }
+
+.cs-col p {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  line-height: 1.8;
+}
+.cs-col p + p { margin-top: 0.75rem; }
+
+.cs-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+}
+.cs-metric {
+  padding: 1.5rem 2rem;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.cs-metric:last-child { border-right: none; }
+.cs-metric-num {
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.cs-metric-num.g { color: var(--green); }
+.cs-metric-num.p { color: var(--purple); }
+.cs-metric-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+
+.cs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--cyan);
+  text-decoration: none;
+  padding: 1rem 2.5rem;
+  border-top: 1px solid var(--border);
+  width: 100%;
+  transition: background 0.2s;
+}
+.cs-link:hover { background: var(--cyan-dim); }
+
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+  .nav-links { gap: 1rem; }
+  section { padding: 4rem 1.5rem; }
+  .hero { padding: 7rem 1.5rem 3rem; }
+  .about-grid, .contact-grid, .edu-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .hero-stats { gap: 1.5rem; }
+}
+
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.nav-burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-mid);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+@media (max-width: 680px) {
+  .nav-burger { display: flex; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0; right: 0;
+    background: rgba(8,11,16,0.98);
+    backdrop-filter: blur(16px);
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    z-index: 99;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { font-size: 0.85rem; }
+  nav { padding: 0 1.25rem; }
+
+  /* Hero */
+  .hero { padding: 5rem 1.25rem 3rem; }
+  h1 { font-size: 2.4rem; }
+  .hero-sub { font-size: 0.95rem; }
+  .hero-stats { gap: 1.25rem; flex-wrap: wrap; }
+  .stat-num { font-size: 1.5rem; }
+  .hero-cta { flex-direction: column; align-items: stretch; }
+  .btn-primary, .btn-ghost { text-align: center; }
+
+  /* Sections */
+  section { padding: 3rem 1.25rem; }
+  h2 { font-size: 1.8rem; margin-bottom: 2rem; }
+
+  /* Case studies */
+  .cs-header { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
+  .cs-meta { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+  .cs-body { grid-template-columns: 1fr; }
+  .cs-col { padding: 1.25rem 1.5rem; border-right: none; border-bottom: 1px solid var(--border); }
+  .cs-col:last-child { border-bottom: none; }
+  .cs-metrics { grid-template-columns: 1fr 1fr; }
+  .cs-metric { padding: 1rem 1.25rem; }
+  .cs-metric-num { font-size: 1.3rem; }
+
+  /* Impact cards */
+  .cards-grid { grid-template-columns: 1fr; }
+
+  /* Education */
+  .edu-grid { grid-template-columns: 1fr; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+
+  /* About */
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .chips { gap: 0.4rem; }
+
+  /* Experiment section */
+  .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+}
+
+@media (max-width: 400px) {
+  h1 { font-size: 2rem; }
+  .cs-metrics { grid-template-columns: 1fr 1fr; }
+  .hero-stats { gap: 1rem; }
+  .stat-num { font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="#" class="nav-logo">odniko<span>.m</span></a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#casestudies">case studies</a></li>
+    <li><a href="#built">built for fun</a></li>
+    <li><a href="#impact">impact</a></li>
+    <li><a href="#education">education</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div style="position:relative;z-index:1;">
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow fade d1">Palo Alto, CA · Product Leader</p>
+  <h1 class="fade d2">
+    Zero to product.<br>
+    <span class="grad">Zero to scale.</span><span class="cursor"></span>
+  </h1>
+  <p class="hero-sub fade d3">
+    5 years building Fintech, Blockchain, and AI products across the US, Singapore, and Mongolia.
+    Zero-to-one launches. Government-adopted platforms. Measurable outcomes at every stage.
+  </p>
+  <div class="hero-cta fade d4">
+    <a href="#casestudies" class="btn-primary">View Case Studies →</a>
+    <a href="#contact" class="btn-ghost">Get in Touch</a>
+  </div>
+  <div class="hero-stats fade d5">
+    <div class="stat">
+      <span class="stat-num">5<span class="u">+</span></span>
+      <span class="stat-label">Years in PM</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Continents</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">0<span class="u">→</span>1</span>
+      <span class="stat-label">Launches</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">60k<span class="u">+</span></span>
+      <span class="stat-label">Credentials Issued</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">4</span>
+      <span class="stat-label">Languages</span>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-bg" id="about">
+  <div class="section-inner">
+    <p class="mono-label">01 · About</p>
+    <div class="about-grid">
+      <div>
+        <h2>PM who ships.<br>Globally.</h2>
+        <div class="about-body">
+          <p>I'm a PM who specializes in translating complex technology into products non-technical users actually adopt. I've launched a blockchain credential platform adopted by a national Ministry of Education, built the second B2B product my company ever sold, and I'm now the sole PM at an early-stage fintech startup in Palo Alto.</p>
+          <p>My edge: I find the root cause before jumping to solutions, ship lean MVPs to learn fast, and turn ambiguous 0-to-1 problems into working products with real outcomes.</p>
+        </div>
+      </div>
+      <div>
+        <p class="skills-title">// Core Expertise</p>
+        <div class="chips" style="margin-bottom:1.5rem;">
+          <span class="chip">Product Strategy</span>
+          <span class="chip">Go-to-Market</span>
+          <span class="chip">UX Optimization</span>
+          <span class="chip">Agile / Scrum</span>
+          <span class="chip">Mobile Releases</span>
+          <span class="chip">Stakeholder Mgmt</span>
+          <span class="chip g">Figma AI</span>
+          <span class="chip g">Tableau</span>
+          <span class="chip g">MySQL</span>
+          <span class="chip g">Jira / Notion</span>
+          <span class="chip g">HubSpot</span>
+          <span class="chip p">Blockchain</span>
+          <span class="chip p">Fintech</span>
+          <span class="chip p">AI / SaaS</span>
+        </div>
+        <p class="skills-title">// Languages</p>
+        <div class="chips">
+          <span class="chip">English</span>
+          <span class="chip">Russian</span>
+          <span class="chip">German</span>
+          <span class="chip">Mongolian</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section class="cs-bg" id="casestudies">
+  <div class="section-inner">
+    <p class="mono-label">02 · Case Studies</p>
+    <h2>Case studies.</h2>
+    <div class="cs-list">
+
+      <!-- CASE STUDY 1: CERTIFY -->
+      <div class="cs-card">
+        <div class="cs-header">
+          <div>
+            <p class="cs-num">// case_study_01</p>
+            <p class="cs-title">Certify.mn — Blockchain Diploma Verification</p>
+            <p class="cs-subtitle">TEO Blockchain</p>
+          </div>
+          <div class="cs-meta">
+            <span class="cs-badge cyan">0 → 1 Launch</span>
+            <span class="cs-badge green">Government Adopted</span>
+            <span class="cs-badge purple">Blockchain · EdTech</span>
+          </div>
+        </div>
+        <div class="cs-body">
+          <div class="cs-col col-problem">
+            <p class="cs-col-label">Problem</p>
+            <p>Mongolia's Ministry of Education discovered 724 fraudulent and 2,000 suspicious diplomas out of 59,000 checked in 2022. Fake credentials were slipping into government jobs and classrooms.</p>
+            <p>For legitimate graduates, verifying a paper diploma meant expensive notarization and weeks of delays — a real barrier for anyone applying to jobs abroad or continuing education overseas.</p>
+          </div>
+          <div class="cs-col col-approach">
+            <p class="cs-col-label">My Approach</p>
+            <p>I named the product, owned go-to-market strategy, and defined the pricing model. The core insight: this couldn't just be a tech solution — the Ministry and universities had to adopt it simultaneously, or it would fail on both sides.</p>
+            <p>I overruled internal pressure for a feature-heavy v1 in favor of a drag-and-drop MVP. I ran blockchain education sessions for institution stakeholders with zero prior familiarity, then took the beta directly to both government officials and university administrators — walking each group through the same platform. Any HR manager or employer can now verify a diploma instantly by drag-and-dropping the file, with no notary, no calls, no waiting.</p>
+          </div>
+          <div class="cs-col col-outcome">
+            <p class="cs-col-label">Outcome</p>
+            <p>Beta launched in 3 months with a 4-person team. After a second 3-month iteration based on real institution feedback, the platform was officially adopted by Mongolia's General Education Authority — now mandated under Mongolian law for all university graduates.</p>
+            <p>75 institutions onboarded. 60,000+ credentials issued to date. Verification went from weeks and notary fees to instant and free.</p>
+          </div>
+        </div>
+        <div class="cs-metrics">
+          <div class="cs-metric">
+            <div class="cs-metric-num">3mo</div>
+            <div class="cs-metric-label">Idea to beta launch</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num g">75</div>
+            <div class="cs-metric-label">Institutions onboarded</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num p">60k+</div>
+            <div class="cs-metric-label">Credentials issued</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num">instant</div>
+            <div class="cs-metric-label">Drag-and-drop verification</div>
+          </div>
+        </div>
+        <a href="https://certify.mn" target="_blank" class="cs-link">↗ View live product — certify.mn</a>
+      </div>
+
+      <!-- CASE STUDY 2: NIKO AI -->
+      <div class="cs-card">
+        <div class="cs-header">
+          <div>
+            <p class="cs-num">// case_study_02</p>
+            <p class="cs-title">NIKO AI Scoring — No-Code ML for Banks</p>
+            <p class="cs-subtitle">AND Solutions · nikoscoring.ai</p>
+          </div>
+          <div class="cs-meta">
+            <span class="cs-badge cyan">0 → 1 Launch</span>
+            <span class="cs-badge green">B2B SaaS · SEA</span>
+            <span class="cs-badge purple">AI · Fintech</span>
+          </div>
+        </div>
+        <div class="cs-body">
+          <div class="cs-col col-problem">
+            <p class="cs-col-label">Problem</p>
+            <p>Banks and lending institutions across Southeast Asia were making credit decisions with spreadsheets and gut instinct. Building proper ML credit scoring models required a data science team — something most regional lenders couldn't afford or hire.</p>
+            <p>AND Solutions needed a new product it could sell into the SEA market. There was no internal roadmap, no validated concept — just a gap in the market and an opportunity to own it.</p>
+          </div>
+          <div class="cs-col col-approach">
+            <p class="cs-col-label">My Approach</p>
+            <p>I identified the opportunity through 100+ outbound discovery conversations with banks and lenders across Southeast Asia, built the business case, and presented it to the steering committee — getting sign-off to build from scratch. I named it NIKO, after my own name.</p>
+            <p>Working directly with ML engineers, I defined the product: a no-code AutoML platform where banks could upload their data, train predictive models, and deploy them without writing a single line of code. I created an ELI5 explainer video to make ML concepts accessible to non-technical bank executives, and personally ran client demos across the region.</p>
+          </div>
+          <div class="cs-col col-outcome">
+            <p class="cs-col-label">Outcome</p>
+            <p>NIKO became the second product AND Solutions ever sold into the Southeast Asian market. It's now a live SaaS platform used by banks, insurance companies, and lenders for credit scoring, debt collection, churn prediction, and insurance claim modeling.</p>
+          </div>
+        </div>
+        <div class="cs-metrics">
+          <div class="cs-metric">
+            <div class="cs-metric-num">2nd</div>
+            <div class="cs-metric-label">Product sold in SEA market</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num g">0→1</div>
+            <div class="cs-metric-label">Internal idea to live SaaS</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num p">4</div>
+            <div class="cs-metric-label">Industries served</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num">0</div>
+            <div class="cs-metric-label">Lines of code needed by users</div>
+          </div>
+        </div>
+        <a href="https://nikoscoring.ai" target="_blank" class="cs-link">↗ View live product — nikoscoring.ai</a>
+      </div>
+
+      <!-- CASE STUDY 3: LENDMN GAMIFICATION -->
+      <div class="cs-card">
+        <div class="cs-header">
+          <div>
+            <p class="cs-num">// case_study_03</p>
+            <p class="cs-title">LendMN — Gamification to Reduce Default Risk</p>
+            <p class="cs-subtitle">AND Solutions · lend.mn</p>
+          </div>
+          <div class="cs-meta">
+            <span class="cs-badge cyan">Behavioral Design</span>
+            <span class="cs-badge green">Fintech · Mobile</span>
+            <span class="cs-badge purple">Data-Driven</span>
+          </div>
+        </div>
+        <div class="cs-body">
+          <div class="cs-col col-problem">
+            <p class="cs-col-label">Problem</p>
+            <p>During a quarterly review, I noticed the risk team was flagging a quiet but dangerous trend — early repayers were shifting to on-time, and on-time payers were slipping 1–2 days late. No penalty existed for the first 3 days, so nothing was catching it.</p>
+            <p>I proactively got sign-off to investigate before it materially hit portfolio quality. Analyzing 12 months of data from active users, I confirmed the behavioral shift was real and accelerating across both segments.</p>
+          </div>
+          <div class="cs-col col-approach">
+            <p class="cs-col-label">My Approach</p>
+            <p>I ran structured customer interviews — 5 interviews with ML engineers and the CS team — testing multiple hypotheses: financial hardship, notification gaps, payment friction. All ruled out. The actual root cause: customers had no reason to pay early.</p>
+            <p>Gamification emerged from a cross-team brainstorm, not as my first instinct. We skipped reminders and nudges because the problem wasn't awareness — it was motivation. I designed a bonus points system tied to things customers cared about: higher loan limits and reduced fees. Presented to the steering committee, approved, and launched within 3 months.</p>
+          </div>
+          <div class="cs-col col-outcome">
+            <p class="cs-col-label">Outcome</p>
+            <p>We targeted 10% improvement in early repayments. Customers adopted far faster than projected — we hit 18%. That created a new problem: points cost exceeded budget. So we iterated: dialed back points per repayment, but expanded redemption value across BNPL and installment products.</p>
+            <p>What started as a repayment fix became a cross-product loyalty system. Default risk dropped 5%, meaningfully improving portfolio quality.</p>
+          </div>
+        </div>
+        <div class="cs-metrics">
+          <div class="cs-metric">
+            <div class="cs-metric-num">3mo</div>
+            <div class="cs-metric-label">Sign-off to launch</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num g">+18%</div>
+            <div class="cs-metric-label">Early repayments vs 10% target</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num p">−5%</div>
+            <div class="cs-metric-label">Default risk reduction</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num">3</div>
+            <div class="cs-metric-label">Products in loyalty system</div>
+          </div>
+        </div>
+        <a href="https://lend.mn/en/loan/consumer_loan/" target="_blank" class="cs-link">↗ View live product — lend.mn</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIMENTS -->
+<section class="exp-bg" id="built" style="background:var(--bg2);">
+  <div class="section-inner">
+    <p class="mono-label">03 · Built for fun</p>
+    <h2>Side builds.</h2>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:1.75rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div>
+          <p style="font-family:var(--mono);font-size:0.7rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;">// experiment_01</p>
+          <p style="font-size:1.05rem;font-weight:600;color:var(--white);">Tempo</p>
+          <p style="font-family:var(--mono);font-size:0.75rem;color:var(--text-mid);margin-top:0.3rem;">Built to fix how I take breaks.</p>
+        </div>
+        <a href="/tempo" target="_blank" style="font-family:var(--mono);font-size:0.78rem;color:var(--cyan);border:1px solid var(--border2);padding:0.5rem 1.1rem;border-radius:4px;text-decoration:none;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='var(--cyan-dim)';this.style.borderColor='var(--border2)'" onmouseout="this.style.background='transparent'">Try it →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="impact-bg" id="impact">
+  <div class="section-inner">
+    <p class="mono-label">04 · Impact</p>
+
+    <h2>Numbers that ship.</h2>
+    <div class="cards-grid">
+      <div class="card c1">
+        <div class="card-num c">1</div>
+        <p class="card-title">Government-Adopted Platform</p>
+        <p class="card-body">Blockchain credential system officially adopted by Mongolia's Ministry of Education. Zero to nationwide infrastructure.</p>
+      </div>
+      <div class="card c2">
+        <div class="card-num g">6×</div>
+        <p class="card-title">International Sales Growth</p>
+        <p class="card-body">Expanded into five new global markets and grew revenue sixfold through strategic positioning and direct negotiation.</p>
+      </div>
+      <div class="card c3">
+        <div class="card-num p">−5%</div>
+        <p class="card-title">Default Risk Reduction</p>
+        <p class="card-body">Incentive model that lifted early repayments 18% and cut default exposure — measurable from day one.</p>
+      </div>
+      <div class="card c1">
+        <div class="card-num c">6</div>
+        <p class="card-title">Strategic Partnerships Closed</p>
+        <p class="card-body">Blockchain education sessions that directly converted into 6 signed strategic partners.</p>
+      </div>
+      <div class="card c2">
+        <div class="card-num g">104%</div>
+        <p class="card-title">SEO Growth via Events</p>
+        <p class="card-body">Virtual fintech event drove triple-digit organic search growth and 7 qualified B2B leads in Southeast Asia.</p>
+      </div>
+      <div class="card c3">
+        <div class="card-num p">3</div>
+        <p class="card-title">Continents, One Playbook</p>
+        <p class="card-body">Built B2C, B2B, and B2B2C products across the US, Singapore, and Mongolia — web and mobile.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section class="edu-bg" id="education">
+  <div class="section-inner">
+    <p class="mono-label">05 · Education</p>
+    <h2>Foundation.</h2>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <p class="edu-degree">M.S. Project Management<br>IT Concentration</p>
+        <p class="edu-school">Golden Gate University</p>
+        <p class="edu-loc">San Francisco, CA</p>
+        <div class="edu-gpa">
+          <span class="gpa-num">3.8</span>
+          <span class="gpa-label">/ 4.0 GPA</span>
+        </div>
+      </div>
+      <div class="edu-card">
+        <p class="edu-degree">B.Com. Marketing</p>
+        <p class="edu-school">Raffles College of Design and Commerce</p>
+        <p class="edu-loc">Ulaanbaatar, Mongolia</p>
+        <div class="edu-gpa">
+          <span class="gpa-num">3.79</span>
+          <span class="gpa-label">/ 4.0 GPA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-bg" id="contact">
+  <div class="section-inner">
+    <p class="mono-label">06 · Contact</p>
+    <div class="contact-grid">
+        <div>
+          <h2>Let's build<br>something.</h2>
+          <div class="contact-quote">
+            // Open to PM roles,<br>
+            // advisory work, and 0→1<br>
+            // product opportunities.
+          </div>
+        </div>
+      <div>
+        <form id="contact-form" style="display:none;">
+          <input type="hidden" name="access_key" value="2dca304b-51bc-414a-b350-1e259a1087be">
+          <input type="hidden" name="subject" value="New message from odniko.com">
+          <div style="display:flex; flex-direction:column; gap:0.85rem;">
+            <div>
+              <input type="text" name="name" placeholder="Your name" required
+                style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.9rem 1.1rem; font-family:var(--mono); font-size:0.82rem; color:var(--text); outline:none; transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <input type="email" name="email" placeholder="Your email" required
+                style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.9rem 1.1rem; font-family:var(--mono); font-size:0.82rem; color:var(--text); outline:none; transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div>
+              <textarea name="message" placeholder="Your message" rows="4" required
+                style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.9rem 1.1rem; font-family:var(--mono); font-size:0.82rem; color:var(--text); outline:none; transition:border-color 0.2s; resize:vertical;"
+                onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="border:none; cursor:pointer; width:100%; text-align:center;" id="submit-btn">
+              Send Message →
+            </button>
+          </div>
+        </form>
+        <div style="display:flex; flex-direction:column; gap:0.85rem;" id="contact-btns">
+          <a href="https://www.linkedin.com/in/odniko/" target="_blank" class="contact-link">
+            <span class="ci">in</span>
+            Connect on LinkedIn
+          </a>
+          <button onclick="toggleForm()" class="btn-primary" style="border:none; cursor:pointer; width:100%; text-align:center;">
+            Get in Touch →
+          </button>
+        </div>
+      </div>
+
+<!-- Success overlay -->
+<div id="success-overlay" style="display:none; position:fixed; inset:0; background:rgba(8,11,16,0.97); z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem;">
+  <div style="text-align:center; max-width:480px; padding:2rem;">
+    <p style="font-family:var(--mono); font-size:0.78rem; color:var(--cyan); letter-spacing:0.15em; margin-bottom:1.5rem;" id="overlay-line1"></p>
+    <h2 style="font-size:3rem; font-weight:700; color:var(--white); letter-spacing:-0.03em; margin-bottom:1rem;" id="overlay-line2"></h2>
+    <p style="font-family:var(--mono); font-size:0.88rem; color:var(--text-mid);" id="overlay-line3"></p>
+    <button onclick="closeOverlay()" style="margin-top:3rem; background:transparent; border:1px solid var(--border2); border-radius:4px; padding:0.75rem 2rem; font-family:var(--mono); font-size:0.78rem; color:var(--text-mid); cursor:pointer; transition:border-color 0.2s, color 0.2s;"
+      onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'"
+      onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text-mid)'">
+      // close
+    </button>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 <span>Odniko Munkhgerel</span> · Palo Alto, CA</p>
+</footer>
+
+</div>
+
+<script>
+  // Intersection observer for fade-in animations
+  function toggleNav() {
+    document.getElementById('nav-links').classList.toggle('open');
+  }
+  // Close nav when a link is clicked
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'));
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.exp-item, .card, .edu-card, .chip').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = `opacity 0.5s ease ${(i % 6) * 0.07}s, transform 0.5s ease ${(i % 6) * 0.07}s`;
+    io.observe(el);
+  });
+
+  // Toggle contact form
+  function toggleForm() {
+    const form = document.getElementById('contact-form');
+    const btns = document.getElementById('contact-btns');
+    form.style.display = 'block';
+    btns.style.display = 'none';
+    form.querySelector('input[name="name"]').focus();
+  }
+
+  function closeOverlay() {
+    const overlay = document.getElementById('success-overlay');
+    const form = document.getElementById('contact-form');
+    const btns = document.getElementById('contact-btns');
+    overlay.style.display = 'none';
+    form.style.display = 'none';
+    btns.style.display = 'flex';
+  }
+
+  function typeLines() {
+    const lines = [
+      { id: 'overlay-line1', text: '> message.send() ✓', delay: 300 },
+      { id: 'overlay-line2', text: 'Consider it done.', delay: 800 },
+      { id: 'overlay-line3', text: "I'll be in touch within 24 hours.", delay: 1400 },
+    ];
+    lines.forEach(({ id, text, delay }) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        el.textContent = '';
+        let i = 0;
+        const t = setInterval(() => {
+          el.textContent += text[i];
+          i++;
+          if (i >= text.length) clearInterval(t);
+        }, 35);
+      }, delay);
+    });
+  }
+
+  // Contact form submission
+  const contactForm = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('submit-btn');
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.textContent = 'Sending...';
+    submitBtn.style.opacity = '0.7';
+
+    const data = new FormData(contactForm);
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: data
+    });
+    const json = await res.json();
+
+    if (json.success) {
+      contactForm.reset();
+      const overlay = document.getElementById('success-overlay');
+      overlay.style.display = 'flex';
+      document.getElementById('overlay-line1').textContent = '';
+      document.getElementById('overlay-line2').textContent = '';
+      document.getElementById('overlay-line3').textContent = '';
+      typeLines();
+      submitBtn.textContent = 'Send Message →';
+      submitBtn.style.opacity = '1';
+    } else {
+      submitBtn.textContent = 'Something went wrong. Try again.';
+      submitBtn.style.opacity = '1';
+      setTimeout(() => { submitBtn.textContent = 'Send Message →'; }, 3000);
+    }
+  });
+
+  // Rocket favicon
+  (function(){
+    const c=document.createElement('canvas');
+    c.width=64;c.height=64;
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#080b10';
+    ctx.beginPath();
+    ctx.roundRect(0,0,64,64,12);
+    ctx.fill();
+    ctx.fillStyle='#38bdf8';
+    // rocket body — bigger, simpler
+    ctx.beginPath();
+    ctx.moveTo(32,4);
+    ctx.bezierCurveTo(32,4,46,18,46,36);
+    ctx.lineTo(40,42);
+    ctx.lineTo(24,42);
+    ctx.lineTo(18,36);
+    ctx.bezierCurveTo(18,18,32,4,32,4);
+    ctx.closePath();
+    ctx.fill();
+    // left fin
+    ctx.beginPath();
+    ctx.moveTo(24,40);
+    ctx.lineTo(16,52);
+    ctx.lineTo(26,48);
+    ctx.closePath();
+    ctx.fill();
+    // right fin
+    ctx.beginPath();
+    ctx.moveTo(40,40);
+    ctx.lineTo(48,52);
+    ctx.lineTo(38,48);
+    ctx.closePath();
+    ctx.fill();
+    // window — dark cutout
+    ctx.fillStyle='#080b10';
+    ctx.beginPath();
+    ctx.arc(32,26,6,0,Math.PI*2);
+    ctx.fill();
+    document.getElementById('portfolio-favicon').href=c.toDataURL('image/png');
+  })();
+</script>
+</body>
+</html>
