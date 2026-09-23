@@ -489,6 +489,21 @@ main{
   </div>
 </div>
 
+<!-- ══ TIME'S UP ══ -->
+<div class="screen" id="s-timesup">
+  <div class="checkin-wrap fade">
+    <div class="eyebrow a" style="justify-content:center;">
+      <span class="eyebrow-dot"></span>
+      Time's up
+    </div>
+    <div class="checkin-activity generic" id="tu-text"></div>
+    <div class="btns" style="max-width:300px;width:100%;">
+      <button class="btn primary" onclick="takeBreak()">Take a break →</button>
+      <button class="btn faint" onclick="confirmReset()">↩ Reset</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ BREAK ══ -->
 <div class="screen" id="s-break">
   <div class="break-wrap">
@@ -708,7 +723,7 @@ function onTouchEnd(e){
 
 // ── STATE ──
 let tasks=[],breakMins=5,taskIdx=0,secsLeft=0,totalSecs=0;
-let tmr=null,skipTmr=null,paused=false,done=0,focMin=0,honest=0,streak=0,maxStreak=0;
+let tmr=null,skipTmr=null,reminderTmr=null,paused=false,done=0,focMin=0,honest=0,streak=0,maxStreak=0;
 
 function addTask(){
   if(tasks.length>=5)return;
@@ -805,8 +820,25 @@ function startFocus(){
   clearInterval(tmr);
   tmr=setInterval(()=>{
     if(!paused){secsLeft--;updateFocusUI();}
-    if(secsLeft<=0){clearInterval(tmr);chime(false);notify('Done ✓',`"${task.name}" — time to rest.`);finishTask();}
+    if(secsLeft<=0)focusTimeUp(task);
   },1000);
+}
+
+function focusTimeUp(task){
+  clearInterval(tmr);
+  chime(false);
+  notify('Done ✓',`"${task.name}" — time to rest.`);
+  document.getElementById('tu-text').textContent='Nice work. Ready for a break?';
+  show('s-timesup');
+  clearInterval(reminderTmr);
+  reminderTmr=setInterval(()=>{
+    notify('Reminder','Your break is still waiting.');
+  },120000);
+}
+
+function takeBreak(){
+  clearInterval(reminderTmr);
+  finishTask();
 }
 
 function startBreak(){
@@ -876,7 +908,7 @@ function doneEarly(){clearInterval(tmr);chime(false);finishTask();}
 function skipBreak(){clearInterval(tmr);clearInterval(skipTmr);showCheckIn();}
 
 function goBack(){
-  clearInterval(tmr);clearInterval(skipTmr);paused=true;
+  clearInterval(tmr);clearInterval(skipTmr);clearInterval(reminderTmr);paused=true;
   const btn=document.getElementById('go-btn');
   btn.textContent='Resume session →';btn.disabled=false;
   btn.onclick=resumeSession;
@@ -893,7 +925,7 @@ function resumeSession(){
   const task=tasks[taskIdx];
   tmr=setInterval(()=>{
     if(!paused){secsLeft--;updateFocusUI();}
-    if(secsLeft<=0){clearInterval(tmr);chime(false);notify('Done ✓',`"${task.name}" — time to rest.`);finishTask();}
+    if(secsLeft<=0)focusTimeUp(task);
   },1000);
 }
 
@@ -909,7 +941,7 @@ function showDone(){
   chime(true);notify('Session complete','Well done.');
 }
 function resetAll(){
-  clearInterval(tmr);clearInterval(skipTmr);
+  clearInterval(tmr);clearInterval(skipTmr);clearInterval(reminderTmr);
   tasks=[];taskIdx=0;done=0;focMin=0;honest=0;streak=0;maxStreak=0;paused=false;secsLeft=0;totalSecs=0;selectedActivity=null;
   const btn=document.getElementById('go-btn');btn.onclick=startSession;btn.textContent="Let's go";btn.disabled=true;
   renderTasks();updateGoBtn();show('s-setup');
