@@ -724,6 +724,7 @@ function onTouchEnd(e){
 // ── STATE ──
 let tasks=[],breakMins=5,taskIdx=0,secsLeft=0,totalSecs=0;
 let tmr=null,skipTmr=null,reminderTmr=null,paused=false,done=0,focMin=0,honest=0,streak=0,maxStreak=0;
+let endAt=0,pauseStart=0;
 
 function addTask(){
   if(tasks.length>=5)return;
@@ -815,11 +816,12 @@ function startFocus(){
   document.getElementById('pause-btn').textContent='Pause';
   document.getElementById('f-label').textContent=task.name;
   totalSecs=task.focus*60;secsLeft=totalSecs;focMin+=task.focus;
+  endAt=Date.now()+totalSecs*1000;
   document.getElementById('f-prog').style.width='100%';
   updateFocusUI();renderPanel();
   clearInterval(tmr);
   tmr=setInterval(()=>{
-    if(!paused){secsLeft--;updateFocusUI();}
+    if(!paused){secsLeft=Math.max(0,Math.round((endAt-Date.now())/1000));updateFocusUI();}
     if(secsLeft<=0)focusTimeUp(task);
   },1000);
 }
@@ -845,19 +847,21 @@ function startBreak(){
   show('s-break');
   renderActs();
   totalSecs=breakMins*60;secsLeft=totalSecs;
+  const breakEndAt=Date.now()+totalSecs*1000;
   document.getElementById('b-prog').style.width='100%';
   let ss=Math.min(120,breakMins*60);
+  const skipEndAt=Date.now()+ss*1000;
   const sb=document.getElementById('skip-btn');
   sb.disabled=true;sb.textContent=`Skip (available in ${fmt(ss)})`;
   clearInterval(skipTmr);
   skipTmr=setInterval(()=>{
-    ss--;
+    ss=Math.max(0,Math.round((skipEndAt-Date.now())/1000));
     if(ss<=0){clearInterval(skipTmr);sb.disabled=false;sb.textContent='Skip rest →';}
     else sb.textContent=`Skip (available in ${fmt(ss)})`;
   },1000);
   clearInterval(tmr);
   tmr=setInterval(()=>{
-    secsLeft--;
+    secsLeft=Math.max(0,Math.round((breakEndAt-Date.now())/1000));
     document.getElementById('b-timer').textContent=fmtS(secsLeft);
     document.getElementById('b-prog').style.width=`${(secsLeft/totalSecs)*100}%`;
     if(secsLeft<=0){clearInterval(tmr);clearInterval(skipTmr);chime(true);notify('Rest over','How was it?');showCheckIn();}
@@ -902,8 +906,12 @@ function selectCheckIn(ok){
   show('s-focus');startFocus();
 }
 
-function togglePause(){paused=!paused;document.getElementById('pause-btn').textContent=paused?'Resume':'Pause';}
-function addMin(){secsLeft+=60;totalSecs+=60;updateFocusUI();}
+function togglePause(){
+  paused=!paused;
+  if(paused)pauseStart=Date.now();else endAt+=Date.now()-pauseStart;
+  document.getElementById('pause-btn').textContent=paused?'Resume':'Pause';
+}
+function addMin(){endAt+=60000;totalSecs+=60;secsLeft+=60;updateFocusUI();}
 function doneEarly(){clearInterval(tmr);chime(false);finishTask();}
 function skipBreak(){clearInterval(tmr);clearInterval(skipTmr);showCheckIn();}
 
@@ -920,11 +928,12 @@ function resumeSession(){
   show('s-focus');paused=false;
   document.getElementById('pause-btn').textContent='Pause';
   document.getElementById('f-label').textContent=tasks[taskIdx].name;
+  endAt=Date.now()+secsLeft*1000;
   updateFocusUI();renderPanel();
   clearInterval(tmr);
   const task=tasks[taskIdx];
   tmr=setInterval(()=>{
-    if(!paused){secsLeft--;updateFocusUI();}
+    if(!paused){secsLeft=Math.max(0,Math.round((endAt-Date.now())/1000));updateFocusUI();}
     if(secsLeft<=0)focusTimeUp(task);
   },1000);
 }
