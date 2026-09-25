@@ -5,31 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tempo — Work at your tempo.</title>
 <link rel="icon" id="t-icon" type="image/png">
+<link rel="apple-touch-icon" id="t-icon-touch">
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('tempo-theme');
+    document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');
+  }catch(e){document.documentElement.setAttribute('data-theme','dark');}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:     #080b10;
-  --bg2:    #0d1117;
-  --surf:   #13181f;
-  --surf2:  #1a2030;
-  --bdr:    rgba(255,255,255,0.06);
-  --bdr2:   rgba(255,255,255,0.11);
-  --cyan:   #38bdf8;
-  --cdim:   rgba(56,189,248,0.10);
-  --cglow:  rgba(56,189,248,0.35);
-  --amber:  #fb923c;
-  --adim:   rgba(251,146,60,0.10);
+  --bg:     #15141b;
+  --bg2:    #1c1b24;
+  --surf:   #1c1b24;
+  --surf2:  #2a2833;
+  --card:   #23222c;
+  --tile:   #2a2833;
+  --bdr:    #35333f;
+  --bdr2:   #3d3b47;
+  --cyan:   oklch(0.68 0.17 275);
+  --cdim:   oklch(0.68 0.17 275 / 0.12);
+  --cglow:  oklch(0.68 0.17 275 / 0.35);
+  --cyan-dark: oklch(0.54 0.16 275);
+  --amber:  oklch(0.7 0.12 180);
+  --adim:   oklch(0.7 0.12 180 / 0.10);
+  --amber-text: oklch(0.8 0.1 180);
+  --wild-fill: oklch(0.3 0.07 275);
   --green:  #34d399;
   --red:    #f87171;
-  --text:   #f1f5f9;
-  --mid:    #94a3b8;
-  --dim:    #475569;
-  --serif:  'Fraunces',Georgia,serif;
-  --sans:   'Inter',system-ui,sans-serif;
-  --mono:   'JetBrains Mono',monospace;
+  --text:   #f3f0ea;
+  --mid:    rgba(243,240,234,0.55);
+  --dim:    rgba(243,240,234,0.35);
+  --ink-on-primary: #15141b;
+  --serif:  'Instrument Serif',Georgia,serif;
+  --sans:   'Manrope',system-ui,sans-serif;
+  --mono:   'DM Mono',monospace;
+}
+:root[data-theme="light"]{
+  --bg:     #efebe4;
+  --bg2:    #fbf8f2;
+  --surf:   #fbf8f2;
+  --surf2:  #efebe4;
+  --card:   #fff;
+  --tile:   #efebe4;
+  --bdr:    #e6e1d8;
+  --bdr2:   #d9d3c8;
+  --cdim:   oklch(0.68 0.17 275 / 0.10);
+  --cglow:  oklch(0.68 0.17 275 / 0.30);
+  --adim:   oklch(0.7 0.12 180 / 0.08);
+  --amber-text: oklch(0.54 0.11 180);
+  --wild-fill: oklch(0.95 0.035 275);
+  --green:  #059669;
+  --red:    #dc2626;
+  --text:   #1f1d1a;
+  --mid:    rgba(31,29,26,0.55);
+  --dim:    rgba(31,29,26,0.35);
 }
 
 html{scroll-behavior:smooth}
@@ -39,14 +74,15 @@ body{
   color:var(--text);
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;
+  transition:background 0.2s,color 0.2s;
 }
 
 /* Subtle grid */
 body::before{
   content:'';position:fixed;inset:0;
   background-image:
-    linear-gradient(rgba(56,189,248,0.02) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(56,189,248,0.02) 1px,transparent 1px);
+    linear-gradient(oklch(0.68 0.17 275 / 0.025) 1px,transparent 1px),
+    linear-gradient(90deg,oklch(0.68 0.17 275 / 0.025) 1px,transparent 1px);
   background-size:40px 40px;
   pointer-events:none;z-index:0;
 }
@@ -54,7 +90,7 @@ body::before{
 /* ── TOPBAR ── */
 .topbar{
   width:100%;
-  background:rgba(8,11,16,0.92);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);
   border-bottom:1px solid var(--bdr);
   padding:0.9rem 1.5rem;
   display:flex;align-items:center;justify-content:center;
@@ -62,21 +98,21 @@ body::before{
   backdrop-filter:blur(12px);
 }
 .logo{display:flex;align-items:center;gap:0.5rem;text-decoration:none;}
-.logo-mark{
-  width:32px;height:32px;
-  background:linear-gradient(135deg,#38bdf8,#a78bfa);
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.logo-mark svg{display:block;}
+.logo-mark{flex-shrink:0;display:flex;}
 .logo-name{
-  font-family:var(--serif);
-  font-size:1.1rem;font-weight:700;
+  font-family:var(--sans);
+  font-size:1.05rem;font-weight:800;
   color:var(--text);letter-spacing:-0.01em;
 }
+.topbar-right{position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:0.6rem;}
+.theme-btn{
+  background:var(--surf);border:1px solid var(--bdr2);color:var(--mid);
+  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:0.85rem;
+  transition:color 0.2s;
+}
+.theme-btn:hover{color:var(--text);}
 .back{
-  position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);
   font-family:var(--sans);font-size:0.72rem;color:var(--dim);
   text-decoration:none;border:1px solid var(--bdr2);
   padding:0.3rem 0.8rem;border-radius:20px;
@@ -97,11 +133,11 @@ main{
 /* ── SHARED ── */
 .eyebrow{
   display:flex;align-items:center;gap:0.5rem;
-  font-family:var(--sans);font-size:0.8rem;font-weight:500;
+  font-family:var(--sans);font-size:0.8rem;font-weight:600;
   margin-bottom:0.85rem;justify-content:center;
 }
 .eyebrow.c{color:var(--cyan);}
-.eyebrow.a{color:var(--amber);}
+.eyebrow.a{color:var(--amber-text);}
 .eyebrow.g{color:var(--green);}
 .eyebrow-dot{
   width:7px;height:7px;border-radius:50%;flex-shrink:0;
@@ -111,34 +147,34 @@ main{
 .eyebrow.g .eyebrow-dot{background:var(--green);}
 @keyframes pulse-c{
   0%,100%{box-shadow:0 0 0 0 var(--cglow);}
-  50%{box-shadow:0 0 0 6px rgba(56,189,248,0);}
+  50%{box-shadow:0 0 0 6px transparent;}
 }
 
 .display-h{
   font-family:var(--serif);
-  font-size:clamp(2rem,5.5vw,2.75rem);
-  font-weight:800;letter-spacing:-0.03em;
-  line-height:1.05;color:var(--text);
+  font-size:clamp(2.1rem,5.5vw,2.9rem);
+  font-weight:400;letter-spacing:-0.01em;
+  line-height:1.02;color:var(--text);
   margin-bottom:0.5rem;
   text-align:center;
 }
 .display-h em{font-style:italic;color:var(--cyan);}
-.display-h.amber em{color:var(--amber);}
+.display-h.amber em{font-style:italic;color:var(--amber-text);}
 
 /* Timer */
 .big-timer{
   font-family:var(--mono);
   font-size:clamp(4.5rem,15vw,6.5rem);
-  font-weight:700;letter-spacing:-0.03em;
+  font-weight:500;letter-spacing:-0.02em;
   line-height:1;margin-bottom:0.75rem;
   text-align:center;
 }
-.big-timer.c{color:var(--cyan);text-shadow:0 0 40px rgba(56,189,248,0.3);}
-.big-timer.a{color:var(--amber);text-shadow:0 0 40px rgba(251,146,60,0.3);}
+.big-timer.c{color:var(--cyan);text-shadow:0 0 40px var(--cglow);}
+.big-timer.a{color:var(--amber-text);text-shadow:0 0 40px var(--adim);}
 
 /* Progress */
 .prog{
-  width:100%;height:3px;
+  width:100%;height:4px;
   background:var(--surf2);
   border-radius:2px;
   overflow:hidden;
@@ -152,7 +188,7 @@ main{
 .task-label{
   font-family:var(--sans);font-size:0.88rem;
   color:var(--dim);text-align:center;
-  margin-bottom:2rem;
+  margin-bottom:1.25rem;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
@@ -160,21 +196,31 @@ main{
 .btns{display:flex;flex-direction:column;gap:0.5rem;width:100%;}
 .btn{
   width:100%;padding:0.95rem 1.5rem;
-  font-family:var(--sans);font-size:0.9rem;font-weight:600;
+  font-family:var(--sans);font-size:0.9rem;font-weight:700;
   border-radius:12px;cursor:pointer;border:none;
   transition:opacity 0.18s,transform 0.12s;text-align:center;
   letter-spacing:0.01em;
 }
 .btn:active{transform:scale(0.98);}
-.btn.primary{background:var(--cyan);color:#07090d;}
-.btn.primary:hover{opacity:0.88;}
+.btn.primary{background:var(--cyan);color:var(--ink-on-primary);box-shadow:0 4px 0 var(--cyan-dark);}
+.btn.primary:hover{opacity:0.92;}
 .btn.ghost{background:var(--surf);color:var(--mid);border:1px solid var(--bdr2);}
 .btn.ghost:hover{color:var(--text);}
 .btn.faint{background:transparent;color:var(--dim);border:1px solid var(--bdr);}
-.btn.faint:hover{color:var(--red);border-color:rgba(248,113,113,0.2);}
-.btn:disabled{opacity:0.25;cursor:not-allowed;transform:none;}
+.btn.faint:hover{color:var(--red);border-color:var(--red);}
+.btn.ink{background:var(--text);color:var(--bg);}
+.btn.ink:hover{opacity:0.88;}
+.btn:disabled{opacity:0.25;cursor:not-allowed;transform:none;box-shadow:none;}
 .btn-row{display:flex;gap:0.5rem;}
 .btn-row .btn{flex:1;}
+
+/* Speech bubble */
+.bubble{
+  background:var(--cyan);color:var(--ink-on-primary);
+  font-family:var(--sans);font-weight:800;font-size:0.95rem;line-height:1.3;
+  padding:0.75rem 0.95rem;border-radius:18px 18px 18px 5px;
+  max-width:220px;
+}
 
 /* ── SETUP ── */
 .notif-strip{
@@ -184,22 +230,20 @@ main{
   margin-bottom:1.75rem;
   font-size:0.8rem;color:var(--dim);
 }
-.notif-strip.denied{background:rgba(248,113,113,0.06);border-color:rgba(248,113,113,0.2);color:var(--red);}
+.notif-strip.denied{background:color-mix(in srgb,var(--red) 8%,transparent);border-color:color-mix(in srgb,var(--red) 25%,transparent);color:var(--red);}
 #notif-btn{
-  margin-left:auto;background:var(--cyan);color:#07090d;
+  margin-left:auto;background:var(--cyan);color:var(--ink-on-primary);
   border:none;border-radius:20px;padding:0.22rem 0.7rem;
   font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;
 }
 
-.setup-headline{margin-bottom:2.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;}
-.eyebrow{
-  display:flex;align-items:center;gap:0.5rem;
-  font-family:var(--sans);font-size:0.8rem;font-weight:500;
-  margin-bottom:0.85rem;justify-content:center;
-}
+.beat-row{display:flex;align-items:flex-end;gap:0.6rem;margin-bottom:1.5rem;}
+.beat-row .bubble{margin-bottom:0.4rem;}
+
+.setup-headline{margin-bottom:2rem;text-align:center;display:flex;flex-direction:column;align-items:center;}
 /* Task card */
 .task-card{
-  background:var(--surf);border:1px solid var(--bdr);
+  background:var(--card);border:1px solid var(--bdr);
   border-radius:14px;padding:1.25rem;
   margin-bottom:0.5rem;
 }
@@ -214,7 +258,7 @@ main{
 .task-num{
   width:22px;height:22px;border-radius:50%;
   background:var(--cdim);color:var(--cyan);
-  font-family:var(--mono);font-size:0.62rem;font-weight:700;
+  font-family:var(--mono);font-size:0.62rem;font-weight:500;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .task-inp{
@@ -231,41 +275,36 @@ main{
 .focus-pills{display:flex;align-items:center;gap:0.4rem;padding-left:1.9rem;}
 .flbl{font-size:0.7rem;color:var(--dim);margin-right:0.2rem;}
 .fpill{
-  font-size:0.72rem;font-weight:500;padding:0.2rem 0.6rem;
+  font-size:0.72rem;font-weight:600;padding:0.2rem 0.6rem;
   border-radius:20px;border:1px solid var(--bdr2);
   background:transparent;color:var(--mid);cursor:pointer;transition:all 0.15s;
 }
-.fpill.on{background:var(--cdim);border-color:rgba(56,189,248,0.3);color:var(--cyan);}
+.fpill.on{background:var(--cdim);border-color:var(--cyan);color:var(--cyan);}
 .fpill:hover:not(.on){color:var(--text);}
 
 .task-card.dragging{opacity:0.3;}
-.task-card.drag-over{border-color:rgba(56,189,248,0.4);background:var(--cdim);}
+.task-card.drag-over{border-color:var(--cyan);background:var(--cdim);}
 
 .add-task-btn{
   width:100%;background:transparent;
-  border:1px dashed var(--bdr2);border-radius:12px;
+  border:1.5px dashed var(--bdr2);border-radius:12px;
   padding:0.8rem;font-family:var(--sans);font-size:0.85rem;color:var(--dim);
   cursor:pointer;transition:all 0.18s;
   display:flex;align-items:center;justify-content:center;gap:0.4rem;
   margin-bottom:1.5rem;
 }
-.add-task-btn:hover:not(:disabled){border-color:rgba(56,189,248,0.3);color:var(--cyan);}
+.add-task-btn:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan);}
 .add-task-btn:disabled{opacity:0.3;cursor:not-allowed;}
 
 /* Break config row */
-.config-row{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:1.25rem;
-}
-.config-label{font-size:0.8rem;color:var(--dim);font-weight:500;}
 .config-pills{display:flex;gap:0.4rem;}
 .bpill{
   flex:1;padding:0.9rem;border-radius:14px;
   border:1px solid var(--bdr2);background:var(--surf2);
-  font-family:var(--serif);font-size:1.2rem;font-weight:700;
+  font-family:var(--mono);font-size:1.1rem;font-weight:500;
   color:var(--mid);cursor:pointer;transition:all 0.15s;text-align:center;
 }
-.bpill.on{background:var(--adim);border-color:rgba(251,146,60,0.3);color:var(--amber);}
+.bpill.on{background:var(--adim);border-color:var(--amber);color:var(--amber-text);}
 .bpill:hover:not(.on){color:var(--text);}
 
 /* ── FOCUS SCREEN ── */
@@ -311,7 +350,7 @@ main{
 .tpanel-item.done .tpdot{border-color:var(--green);background:var(--green);}
 @keyframes throb{
   0%,100%{box-shadow:0 0 0 0 var(--cglow);}
-  50%{box-shadow:0 0 0 4px rgba(56,189,248,0);}
+  50%{box-shadow:0 0 0 4px transparent;}
 }
 .tpname{font-size:0.85rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
 .tpanel-item.done .tpname{text-decoration:line-through;color:var(--dim);}
@@ -320,27 +359,30 @@ main{
 
 /* ── BREAK ── */
 .break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1rem;}
-.break-acts-label{
-  font-size:0.78rem;color:var(--dim);
-  margin-bottom:1rem;letter-spacing:0.04em;
-}
 .act-grid{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:0.5rem;width:100%;margin-bottom:2rem;
+  gap:0.6rem;width:100%;margin-bottom:2rem;
 }
 .act-card{
-  background:var(--surf);border:1px solid var(--bdr2);
-  border-radius:12px;padding:0.9rem 0.75rem;
+  background:var(--card);border:1.5px solid var(--bdr);
+  border-radius:20px;padding:0.9rem;
   cursor:pointer;transition:all 0.18s;
-  display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-  text-align:center;
+  display:flex;align-items:center;gap:0.7rem;
+  text-align:left;
 }
-.act-card:hover{border-color:rgba(251,146,60,0.3);}
+.act-card:hover{border-color:var(--amber);}
 .act-card.picked{border-color:var(--amber);background:var(--adim);}
 .act-card.dimmed{opacity:0.3;}
-.act-emoji{font-size:1.4rem;line-height:1;}
-.act-text{font-size:0.78rem;color:var(--mid);font-weight:500;line-height:1.35;}
-.act-card.picked .act-text{color:var(--amber);}
+.act-card.wild{background:var(--wild-fill);border-color:var(--cyan);}
+.act-card.wild:hover{border-color:var(--cyan);}
+.act-card.wild.picked{border-color:var(--cyan);background:var(--wild-fill);}
+.act-tile{
+  width:64px;height:64px;border-radius:14px;background:var(--tile);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  overflow:hidden;
+}
+.act-card.wild .act-tile{background:var(--surf);}
+.act-text{font-size:0.85rem;color:var(--text);font-weight:700;line-height:1.3;}
 
 .skip-section{display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:300px;}
 .skip-btn{
@@ -349,45 +391,75 @@ main{
   font-family:var(--sans);font-size:0.82rem;color:var(--dim);
   cursor:pointer;transition:all 0.18s;
 }
-.skip-btn:not(:disabled):hover{color:var(--amber);border-color:rgba(251,146,60,0.25);}
+.skip-btn:not(:disabled):hover{color:var(--amber-text);border-color:var(--amber);}
 .skip-btn:disabled{opacity:0.3;cursor:not-allowed;}
 
 /* ── CHECK-IN ── */
 .checkin-wrap{
   display:flex;flex-direction:column;
   align-items:center;text-align:center;
-  padding-top:2rem;
+  padding-top:1rem;
 }
 .checkin-activity{
-  font-family:var(--serif);
-  font-size:clamp(1.8rem,5vw,2.5rem);
-  font-weight:800;letter-spacing:-0.03em;
-  line-height:1.1;color:var(--amber);
-  margin-bottom:2.5rem;
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.9rem,5vw,2.6rem);
+  font-weight:400;letter-spacing:-0.01em;
+  line-height:1.05;color:var(--amber-text);
+  margin-bottom:2rem;
   max-width:400px;
 }
-.checkin-activity.generic{color:var(--text);}
+.checkin-activity.generic{color:var(--text);font-style:normal;}
 
 /* ── COMPLETE ── */
+.done-bubble-row{display:flex;flex-direction:column;align-items:center;gap:0.5rem;margin-bottom:0.5rem;}
 .stats{
   display:flex;gap:0;width:100%;
   border:1px solid var(--bdr);border-radius:14px;
-  overflow:hidden;background:var(--surf);
+  overflow:hidden;background:var(--card);
   margin-bottom:2rem;
 }
 .stat{flex:1;padding:1.5rem 1rem;border-right:1px solid var(--bdr);text-align:center;}
 .stat:last-child{border-right:none;}
 .stat-n{
-  font-family:var(--mono);font-size:2rem;font-weight:700;
+  font-family:var(--mono);font-size:1.9rem;font-weight:500;
   line-height:1;margin-bottom:0.35rem;
 }
 .stat-n.c{color:var(--cyan);}
-.stat-n.a{color:var(--amber);}
+.stat-n.a{color:var(--amber-text);}
 .stat-l{font-size:0.68rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;}
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .fade{animation:fadeUp 0.35s ease forwards;}
+
+/* ── BEAT keyframes (ported from design handoff Mascot.dc.html) ── */
+@keyframes tempoSwing { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+@keyframes tempoBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes tempoHop { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-14px); } }
+@keyframes tempoBreathe { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.02,0.98); } }
+@keyframes tempoBigBreath { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.07,0.96); } }
+@keyframes tempoSquat { 0%,100% { transform: translateY(0) scale(1,1); } 50% { transform: translateY(12px) scale(1.07,0.88); } }
+@keyframes tempoTilt { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+@keyframes tempoWalk { 0%,100% { transform: translate(0,0) rotate(-3deg); } 50% { transform: translate(0,-5px) rotate(3deg); } }
+@keyframes tempoScan { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes tempoShiver { 0%,100% { transform: translateX(-1.5px); } 50% { transform: translateX(1.5px); } }
+@keyframes tempoLean { 0%,100% { transform: rotate(-12deg); } 50% { transform: rotate(-9deg); } }
+@keyframes tempoPuff { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes tempoFlop { 0%,100% { transform: translate(45px,-30px) rotate(-80deg) scale(0.85); } 50% { transform: translate(45px,-30px) rotate(-76deg) scale(0.85,0.82); } }
+@keyframes tempoRobotArm { 0% { transform: rotate(0deg); } 100% { transform: rotate(-70deg); } }
+@keyframes tempoArmSwing { 0% { transform: rotate(-28deg); } 100% { transform: rotate(28deg); } }
+@keyframes tempoRoll { 0% { transform: rotate(0deg) translateY(0); } 100% { transform: rotate(28deg) translateY(-4px); } }
+@keyframes tempoWave { 0% { transform: rotate(0deg); } 100% { transform: rotate(-40deg); } }
+@keyframes tempoJack { 0% { transform: rotate(0deg); } 100% { transform: rotate(130deg); } }
+@keyframes tempoWrist { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
+@keyframes tempoDance { 0% { transform: rotate(-30deg); } 100% { transform: rotate(110deg); } }
+@keyframes tempoZ { 0% { opacity: 0; transform: translate(0,0); } 50% { opacity: 1; } 100% { opacity: 0; transform: translate(8px,-14px); } }
+@keyframes tempoDrop { 0% { opacity: 0; transform: translateY(-10px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(18px); } }
+@keyframes tempoTwinkle { 0%,100% { opacity: 0.2; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes tempoPuffOut { 0% { opacity: 0; transform: translateX(6px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateX(-14px); } }
+@media (prefers-reduced-motion: reduce){
+  .beat-svg *{animation:none!important;}
+}
 
 /* ── RESPONSIVE ── */
 @media(max-width:480px){
@@ -411,16 +483,13 @@ main{
 <!-- TOPBAR -->
 <header class="topbar">
   <a class="logo" href="#">
-    <div class="logo-mark">
-      <svg width="14" height="17" viewBox="0 0 14 17" fill="none">
-        <rect x="1" y="1" width="5" height="13" rx="2.5" fill="#07090d"/>
-        <rect x="8" y="1" width="5" height="13" rx="2.5" fill="#07090d"/>
-        <circle cx="7" cy="16" r="1.8" fill="#07090d" opacity="0.5"/>
-      </svg>
-    </div>
+    <div class="logo-mark" id="header-icon"></div>
     <span class="logo-name">Tempo</span>
   </a>
-  <a class="back" href="/">← odniko.com</a>
+  <div class="topbar-right">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme"></button>
+    <a class="back" href="/">← odniko.com</a>
+  </div>
 </header>
 
 <main>
@@ -433,6 +502,11 @@ main{
     <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
     <span id="notif-msg">Enable notifications</span>
     <button id="notif-btn" onclick="reqNotif()">Enable</button>
+  </div>
+
+  <div class="beat-row">
+    <div id="setup-beat"></div>
+    <div class="bubble">Drop the first task, let's jam!</div>
   </div>
 
   <div class="setup-headline">
@@ -449,7 +523,7 @@ main{
 
   <!-- Break config -->
   <p style="font-size:0.7rem;font-weight:600;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;">Break length</p>
-  <div style="display:flex;gap:0.6rem;margin-bottom:1.5rem;">
+  <div class="config-pills" style="margin-bottom:1.5rem;">
     <button class="bpill on" onclick="setBreak(5,this)">5</button>
     <button class="bpill" onclick="setBreak(10,this)">10</button>
     <button class="bpill" onclick="setBreak(15,this)">15</button>
@@ -465,6 +539,7 @@ main{
       <span class="eyebrow-dot"></span>
       Focusing
     </div>
+    <div id="focus-beat" style="margin-bottom:0.5rem;"></div>
     <div class="big-timer c" id="f-timer">25 : 00</div>
     <div class="prog"><div class="prog-fill c" id="f-prog"></div></div>
     <p class="task-label" id="f-label"></p>
@@ -527,6 +602,7 @@ main{
 <!-- ══ CHECK-IN ══ -->
 <div class="screen" id="s-checkin">
   <div class="checkin-wrap fade">
+    <div id="ci-beat" style="margin-bottom:0.5rem;"></div>
     <div class="eyebrow a" style="justify-content:center;">
       <span class="eyebrow-dot"></span>
       ♩ Check in
@@ -541,7 +617,11 @@ main{
 
 <!-- ══ COMPLETE ══ -->
 <div class="screen" id="s-done">
-  <div class="fade" style="padding-top:1.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;">
+  <div class="fade" style="padding-top:0.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;">
+    <div class="done-bubble-row">
+      <div class="bubble">That session SLAPPED!</div>
+      <div id="done-beat"></div>
+    </div>
     <div class="eyebrow g">
       <span class="eyebrow-dot"></span>
       Session complete
@@ -554,27 +634,284 @@ main{
       <div class="stat"><div class="stat-n a" id="ds-h">0</div><div class="stat-l">Honest</div></div>
       <div class="stat"><div class="stat-n c" id="ds-s">0</div><div class="stat-l">Streak</div></div>
     </div>
-    <button class="btn primary" onclick="resetAll()">Start a new session</button>
+    <button class="btn ink" onclick="resetAll()">Start a new session</button>
   </div>
 </div>
 
 </main>
 
 <script>
-// ── FAVICON ──
+// ── THEME ──
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('tempo-theme',t);}catch(e){}
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light');
+}
+applyTheme(document.documentElement.getAttribute('data-theme')||'dark');
+
+// ── APP ICON (ported from design handoff AppIcon.dc.html) ──
+function appIconSVG(size,eyes,standalone){
+  const e=eyes?'inline':'none';
+  const ns=standalone?' xmlns="http://www.w3.org/2000/svg"':'';
+  return `<svg${ns} viewBox="0 0 64 64" width="${size}" height="${size}" style="display:block">
+    <rect x="0" y="0" width="64" height="64" rx="15" fill="#7b7ff0"></rect>
+    <rect x="38" y="11" width="6.5" height="33" rx="3.25" fill="#fbf8f2"></rect>
+    <ellipse cx="30" cy="43" rx="14.5" ry="10.5" fill="#fbf8f2" transform="rotate(-18 30 43)"></ellipse>
+    <circle cx="24.5" cy="42.5" r="2.4" fill="#1f1d1a" display="${e}"></circle>
+    <circle cx="33" cy="40" r="2.4" fill="#1f1d1a" display="${e}"></circle>
+  </svg>`;
+}
+document.getElementById('header-icon').innerHTML=appIconSVG(30,true,false);
+
+// ── FAVICON (Beat's note shape, replacing old pause-bars icon) ──
+function svgToPngDataUrl(svgStr,px,cb){
+  const img=new Image();
+  const blob=new Blob([svgStr],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  img.onerror=function(){URL.revokeObjectURL(url);};
+  img.onload=function(){
+    const c=document.createElement('canvas');c.width=px;c.height=px;
+    c.getContext('2d').drawImage(img,0,0,px,px);
+    URL.revokeObjectURL(url);
+    cb(c.toDataURL('image/png'));
+  };
+  img.src=url;
+}
 (function(){
-  const c=document.createElement('canvas');c.width=64;c.height=64;
-  const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,64,64);
-  g.addColorStop(0,'#38bdf8');g.addColorStop(1,'#a78bfa');
-  x.fillStyle=g;x.beginPath();x.roundRect(0,0,64,64,14);x.fill();
-  x.fillStyle='#07090d';
-  x.beginPath();x.roundRect(14,12,14,34,6);x.fill();
-  x.beginPath();x.roundRect(36,12,14,34,6);x.fill();
-  x.globalAlpha=0.5;x.beginPath();x.arc(32,56,5,0,Math.PI*2);x.fill();
-  x.globalAlpha=1;
-  document.getElementById('t-icon').href=c.toDataURL('image/png');
+  svgToPngDataUrl(appIconSVG(64,false,true),32,function(u){document.getElementById('t-icon').href=u;});
+  svgToPngDataUrl(appIconSVG(180,true,true),180,function(u){document.getElementById('t-icon-touch').href=u;});
 })();
+
+// ── BEAT MASCOT (ported from design handoff Mascot.dc.html, concept="beat" only) ──
+const BEAT_POSES={
+  idle:{f:'idle',a:[20,-20],b:'tempoBob 1.3s ease-in-out infinite'},
+  focus:{f:'focus',a:[45,-45],b:'tempoBob 1s ease-in-out infinite'},
+  rest:{f:'rest',a:[8,-8],b:'tempoBreathe 3.6s ease-in-out infinite'},
+  cele:{f:'cele',a:[150,-150],b:'tempoHop 0.7s ease-in-out infinite',p:['confetti'],lift:-6},
+  sad:{f:'sad',a:[4,-4]},
+  squat:{f:'focus',a:[90,-90],b:'tempoSquat 1.1s ease-in-out infinite'},
+  robot:{f:'robot',a:[90,-90],b:'tempoTilt 0.5s steps(2) infinite alternate',arm:'tempoRobotArm 0.5s steps(2) infinite alternate',mirror:true,rev:true},
+  walk:{f:'idle',a:[8,-8],b:'tempoWalk 0.6s ease-in-out infinite',arm:'tempoArmSwing 0.6s ease-in-out infinite alternate',rev:true},
+  look:{f:'look',a:[20,107],b:'tempoScan 3s ease-in-out infinite'},
+  breathe:{f:'calm',a:[30,-30],b:'tempoBreathe 4s ease-in-out infinite'},
+  water:{f:'calm',a:[20,120],b:'tempoBob 2s ease-in-out infinite',p:['glass']},
+  drink:{f:'calm',a:[20,60],b:'tempoBreathe 3s ease-in-out infinite',p:['mug']},
+  deepbreath:{f:'puff',a:[35,-35],b:'tempoBigBreath 2.4s ease-in-out infinite',p:['puffs']},
+  shoulders:{f:'idle',a:[12,-12],b:'tempoBob 1s ease-in-out infinite',arm:'tempoRoll 0.5s ease-in-out infinite alternate',mirror:true},
+  outside:{f:'happy',a:[150,-20],b:'tempoBob 1.3s ease-in-out infinite',armL:'tempoWave 0.4s ease-in-out infinite alternate',p:['sun']},
+  splash:{f:'shock',a:[155,-155],b:'tempoShiver 0.12s linear infinite',p:['drops']},
+  song:{f:'calm',a:[20,-20],b:'tempoScan 1.2s ease-in-out infinite',p:['notes']},
+  text:{f:'idle',a:[20,60],b:'tempoBob 1.6s ease-in-out infinite',p:['phone','heart']},
+  jacks:{f:'happy',a:[20,-20],b:'tempoHop 0.8s ease-in-out infinite',arm:'tempoJack 0.4s ease-in-out infinite alternate',mirror:true},
+  silence:{f:'calm',a:[60,-60],b:'tempoBreathe 5s ease-in-out infinite',p:['dots']},
+  wrists:{f:'focus',a:[85,-85],arm:'tempoWrist 0.8s ease-in-out infinite alternate',mirror:true},
+  scream:{f:'squeeze',a:[70,-70],b:'tempoShiver 0.1s linear infinite',p:['pillow']},
+  compliment:{f:'happy',a:[20,-150],b:'tempoBob 1.3s ease-in-out infinite',p:['sparkle']},
+  ceiling:{f:'up',a:[4,-4],b:'tempoLean 4s ease-in-out infinite',still:'rotate(-12deg)'},
+  dance:{f:'cele',a:[20,-20],b:'tempoWalk 0.35s ease-in-out infinite',arm:'tempoDance 0.35s ease-in-out infinite alternate',mirror:true,rev:true,p:['notes']},
+  power:{f:'proud',a:[-35,35],b:'tempoPuff 2s ease-in-out infinite'},
+  blue:{f:'look',a:[20,70],b:'tempoScan 2s ease-in-out infinite',p:['magnifier','bluedots']},
+  hug:{f:'calm',a:[-55,55],b:'tempoScan 2s ease-in-out infinite',p:['heart']},
+  flop:{f:'calm',a:[150,-10],b:'tempoFlop 2s ease-in-out infinite',still:'translate(45px,-30px) rotate(-80deg) scale(0.85)'},
+  accent:{f:'happy',a:[20,-130],b:'tempoTilt 0.6s ease-in-out infinite alternate',armR:'tempoWave 0.3s ease-in-out infinite alternate',p:['bubble']},
+};
+const BEAT_FACES=['idle','focus','rest','calm','puff','happy','shock','squeeze','up','proud','cele','robot','look','sad'];
+const BEAT_PROPS=['sun','confetti','glass','mug','puffs','drops','notes','phone','heart','dots','pillow','sparkle','magnifier','bluedots','bubble'];
+function beatStyleStr(o){
+  return Object.entries(o).filter(([,v])=>v!==undefined).map(([k,v])=>`${k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())}:${v}`).join(';');
+}
+function renderBeatSVG(mood,size,animate){
+  const pose=BEAT_POSES[mood]||BEAT_POSES.idle;
+  const lx=48,ly=136,rx=134,ry=134,fx=88,fy=144;
+  const lift=pose.lift??0;
+  const [aL,aR]=pose.a;
+  const rad=aR*Math.PI/180;
+  const hx=(rx-28*Math.sin(rad)).toFixed(1);
+  const hy=(ry+lift+28*Math.cos(rad)).toFixed(1);
+  const on=b=>b?'inline':'none';
+  const A=s=>(animate&&s?s:'none');
+  const dFace={};BEAT_FACES.forEach(f=>{dFace[f]=on(pose.f===f);});
+  const pShow={};BEAT_PROPS.forEach(p=>{pShow[p]=on((pose.p||[]).includes(p));});
+  const armL=pose.armL??pose.arm;
+  let armR=pose.armR??pose.arm;
+  if(armR&&pose.rev)armR=armR.replace('alternate','alternate-reverse');
+  const body='oklch(0.68 0.17 275)',dark='oklch(0.54 0.16 275)';
+  const bodyAnim=beatStyleStr({transformBox:'view-box',transformOrigin:'100px 190px',animation:A(pose.b),transform:(!animate&&pose.still)?pose.still:undefined});
+  const armLAnim=beatStyleStr({transformBox:'fill-box',transformOrigin:'50% 0%',animation:A(armL)});
+  const armRAnim=beatStyleStr({transformBox:'fill-box',transformOrigin:'50% 0%',animation:A(armR),scale:pose.mirror?'-1 1':undefined});
+  const zAnim=beatStyleStr({animation:A('tempoZ 2.4s ease-out infinite')});
+  const riseA=beatStyleStr({animation:A('tempoZ 2s ease-out infinite')});
+  const riseB=beatStyleStr({animation:A('tempoZ 2s ease-out 1s infinite')});
+  const dropA=beatStyleStr({animation:A('tempoDrop 0.9s ease-in infinite')});
+  const puffA=beatStyleStr({animation:A('tempoPuffOut 2.4s ease-out infinite')});
+  const twinkleA=beatStyleStr({transformBox:'fill-box',transformOrigin:'50% 50%',animation:A('tempoTwinkle 1.4s ease-in-out infinite')});
+  const twinkleB=beatStyleStr({transformBox:'fill-box',transformOrigin:'50% 50%',animation:A('tempoTwinkle 1.4s ease-in-out 0.7s infinite')});
+  return `<svg viewBox="0 0 200 200" width="${size}" height="${size}" style="display:block;overflow:visible" class="beat-svg">
+  <ellipse cx="100" cy="190" rx="52" ry="6" fill="rgba(31,29,26,0.10)"></ellipse>
+  <g display="${pShow.sun}"><circle cx="34" cy="40" r="15" fill="oklch(0.86 0.13 90)" style="${twinkleA}"></circle></g>
+  <g style="${bodyAnim}">
+    <g>
+      <ellipse cx="78" cy="182" rx="13" ry="7" fill="${dark}"></ellipse>
+      <ellipse cx="112" cy="182" rx="13" ry="7" fill="${dark}"></ellipse>
+      <rect x="126" y="30" width="13" height="112" rx="6.5" fill="${dark}"></rect>
+      <circle cx="132.5" cy="26" r="9" fill="${body}"></circle>
+      <ellipse cx="92" cy="140" rx="50" ry="38" fill="${body}" transform="rotate(-18 92 140)"></ellipse>
+      <ellipse cx="66" cy="120" rx="10" ry="6" fill="rgba(255,255,255,0.3)" transform="rotate(-35 66 120)"></ellipse>
+    </g>
+    <g transform="translate(${lx} ${ly+lift}) rotate(${aL})"><g style="${armLAnim}"><ellipse cx="0" cy="13" rx="8" ry="15" fill="${dark}"></ellipse></g></g>
+    <g transform="translate(${rx} ${ry+lift}) rotate(${aR})"><g style="${armRAnim}"><ellipse cx="0" cy="13" rx="8" ry="15" fill="${dark}"></ellipse></g></g>
+    <g transform="translate(${fx} ${fy})">
+      <circle cx="-30" cy="8" r="6" fill="oklch(0.82 0.1 15)" opacity="0.7"></circle>
+      <circle cx="30" cy="8" r="6" fill="oklch(0.82 0.1 15)" opacity="0.7"></circle>
+      <g display="${dFace.idle}">
+        <circle cx="-17" cy="-6" r="7.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-6" r="7.5" fill="#1f1d1a"></circle>
+        <circle cx="-14.5" cy="-8.5" r="2.6" fill="#fff"></circle>
+        <circle cx="19.5" cy="-8.5" r="2.6" fill="#fff"></circle>
+        <path d="M -9 10 Q 0 19 9 10" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.focus}">
+        <circle cx="-17" cy="-3" r="6.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-3" r="6.5" fill="#1f1d1a"></circle>
+        <path d="M -27 -17 L -10 -12 M 27 -17 L 10 -12" fill="none" style="stroke:#1f1d1a;stroke-width:4.5;stroke-linecap:round"></path>
+        <path d="M -6 14 L 6 14" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.rest}">
+        <path d="M -25 -5 Q -17 2 -9 -5 M 9 -5 Q 17 2 25 -5" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+        <ellipse cx="0" cy="13" rx="3.5" ry="4" fill="#1f1d1a"></ellipse>
+        <g style="${zAnim}"><text x="30" y="-26" font-size="18" font-weight="700" fill="#1f1d1a">z</text></g>
+      </g>
+      <g display="${dFace.calm}">
+        <path d="M -25 -5 Q -17 2 -9 -5 M 9 -5 Q 17 2 25 -5" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+        <path d="M -7 11 Q 0 17 7 11" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.puff}">
+        <path d="M -25 -5 Q -17 2 -9 -5 M 9 -5 Q 17 2 25 -5" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+        <circle cx="-2" cy="13" r="5" fill="#1f1d1a"></circle>
+      </g>
+      <g display="${dFace.happy}">
+        <path d="M -25 -3 L -17 -12 L -9 -3 M 9 -3 L 17 -12 L 25 -3" fill="none" style="stroke:#1f1d1a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"></path>
+        <path d="M -10 9 Q 0 21 10 9" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.shock}">
+        <circle cx="-17" cy="-6" r="9" fill="#fff" style="stroke:#1f1d1a;stroke-width:3"></circle>
+        <circle cx="17" cy="-6" r="9" fill="#fff" style="stroke:#1f1d1a;stroke-width:3"></circle>
+        <circle cx="-17" cy="-6" r="3.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-6" r="3.5" fill="#1f1d1a"></circle>
+        <ellipse cx="0" cy="15" rx="5" ry="7" fill="#1f1d1a"></ellipse>
+      </g>
+      <g display="${dFace.squeeze}">
+        <path d="M -26 -13 L -12 -6 L -26 1 M 26 -13 L 12 -6 L 26 1" fill="none" style="stroke:#1f1d1a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"></path>
+        <path d="M -11 7 Q 0 26 11 7 Z" fill="#1f1d1a" style="stroke:#1f1d1a;stroke-width:3;stroke-linejoin:round"></path>
+      </g>
+      <g display="${dFace.up}">
+        <circle cx="-17" cy="-6" r="7.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-6" r="7.5" fill="#1f1d1a"></circle>
+        <circle cx="-17" cy="-11" r="2.8" fill="#fff"></circle>
+        <circle cx="17" cy="-11" r="2.8" fill="#fff"></circle>
+        <path d="M -5 14 L 5 14" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.proud}">
+        <circle cx="-17" cy="-4" r="6.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-4" r="6.5" fill="#1f1d1a"></circle>
+        <path d="M -26 -17 L -10 -15 M 26 -17 L 10 -15" fill="none" style="stroke:#1f1d1a;stroke-width:4.5;stroke-linecap:round"></path>
+        <path d="M -9 10 Q 2 19 11 7" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.cele}">
+        <path d="M -25 -3 L -17 -12 L -9 -3 M 9 -3 L 17 -12 L 25 -3" fill="none" style="stroke:#1f1d1a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"></path>
+        <path d="M -11 6 Q 0 28 11 6 Z" fill="#1f1d1a" style="stroke:#1f1d1a;stroke-width:3;stroke-linejoin:round"></path>
+      </g>
+      <g display="${dFace.robot}">
+        <rect x="-24" y="-13" width="13" height="13" rx="2" fill="#1f1d1a"></rect>
+        <rect x="11" y="-13" width="13" height="13" rx="2" fill="#1f1d1a"></rect>
+        <rect x="-21" y="-11" width="4" height="4" fill="#fff"></rect>
+        <rect x="14" y="-11" width="4" height="4" fill="#fff"></rect>
+        <rect x="-10" y="9" width="20" height="7" rx="2" fill="#1f1d1a"></rect>
+      </g>
+      <g display="${dFace.look}">
+        <ellipse cx="-20" cy="-5" rx="7" ry="5" fill="#1f1d1a"></ellipse>
+        <ellipse cx="14" cy="-5" rx="7" ry="5" fill="#1f1d1a"></ellipse>
+        <circle cx="-23" cy="-7" r="2" fill="#fff"></circle>
+        <circle cx="11" cy="-7" r="2" fill="#fff"></circle>
+        <path d="M -8 12 Q -2 17 4 12" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+      </g>
+      <g display="${dFace.sad}">
+        <circle cx="-17" cy="-2" r="6.5" fill="#1f1d1a"></circle>
+        <circle cx="17" cy="-2" r="6.5" fill="#1f1d1a"></circle>
+        <path d="M -26 -13 L -11 -17 M 26 -13 L 11 -17" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+        <path d="M -8 18 Q 0 11 8 18" fill="none" style="stroke:#1f1d1a;stroke-width:4;stroke-linecap:round"></path>
+        <ellipse cx="33" cy="-20" rx="4.5" ry="6.5" fill="oklch(0.8 0.08 230)"></ellipse>
+      </g>
+      <g display="${pShow.pillow}"><rect x="-32" y="0" width="64" height="30" rx="13" fill="#fbf8f2" style="stroke:#d9d3c8;stroke-width:3"></rect></g>
+      <g display="${pShow.puffs}"><g style="${puffA}">
+        <circle cx="-38" cy="13" r="4.5" fill="oklch(0.9 0.04 200)"></circle>
+        <circle cx="-50" cy="10" r="3.5" fill="oklch(0.9 0.04 200)"></circle>
+        <circle cx="-60" cy="7" r="2.5" fill="oklch(0.9 0.04 200)"></circle>
+      </g></g>
+    </g>
+    <g transform="translate(${hx} ${hy})">
+      <g display="${pShow.glass}">
+        <rect x="-7" y="-20" width="14" height="22" rx="2.5" fill="oklch(0.88 0.06 220)" style="stroke:#fbf8f2;stroke-width:2"></rect>
+        <rect x="-5" y="-12" width="10" height="12" rx="1.5" fill="oklch(0.74 0.1 225)"></rect>
+      </g>
+      <g display="${pShow.mug}">
+        <circle cx="10" cy="-7" r="5" fill="none" style="stroke:#fbf8f2;stroke-width:3"></circle>
+        <rect x="-9" y="-16" width="18" height="18" rx="4" fill="#fbf8f2"></rect>
+        <g style="${riseA}"><circle cx="-3" cy="-24" r="3" fill="rgba(31,29,26,0.18)"></circle><circle cx="3" cy="-32" r="2.5" fill="rgba(31,29,26,0.14)"></circle></g>
+      </g>
+      <g display="${pShow.phone}">
+        <rect x="-7" y="-24" width="14" height="24" rx="3" fill="#1f1d1a"></rect>
+        <rect x="-5" y="-21" width="10" height="17" rx="1.5" fill="oklch(0.85 0.08 180)"></rect>
+      </g>
+      <g display="${pShow.magnifier}">
+        <rect x="-1.75" y="-6" width="3.5" height="10" rx="1.5" fill="#1f1d1a"></rect>
+        <circle cx="0" cy="-15" r="9" fill="rgba(255,255,255,0.55)" style="stroke:#1f1d1a;stroke-width:3"></circle>
+      </g>
+    </g>
+  </g>
+  <g display="${pShow.drops}"><g style="${dropA}">
+    <ellipse cx="66" cy="66" rx="3.5" ry="5.5" fill="oklch(0.74 0.1 225)"></ellipse>
+    <ellipse cx="92" cy="54" rx="3.5" ry="5.5" fill="oklch(0.74 0.1 225)"></ellipse>
+    <ellipse cx="112" cy="74" rx="3" ry="5" fill="oklch(0.74 0.1 225)"></ellipse>
+  </g></g>
+  <g display="${pShow.notes}">
+    <g style="${riseA}"><text x="30" y="92" font-size="24" font-weight="700" fill="oklch(0.54 0.16 275)">♪</text></g>
+    <g style="${riseB}"><text x="156" y="72" font-size="22" font-weight="700" fill="oklch(0.54 0.11 180)">♫</text></g>
+  </g>
+  <g display="${pShow.heart}"><g style="${riseA}"><text x="150" y="100" font-size="22" fill="oklch(0.7 0.15 10)">♥</text></g></g>
+  <g display="${pShow.dots}"><text x="26" y="92" font-size="30" font-weight="700" fill="rgba(31,29,26,0.45)">…</text></g>
+  <g display="${pShow.sparkle}">
+    <g style="${twinkleA}"><text x="30" y="88" font-size="22" fill="oklch(0.62 0.11 180)">✦</text></g>
+    <g style="${twinkleB}"><text x="160" y="118" font-size="16" fill="oklch(0.62 0.16 275)">✦</text></g>
+  </g>
+  <g display="${pShow.bluedots}">
+    <circle cx="30" cy="118" r="5" fill="oklch(0.62 0.14 245)" style="${twinkleA}"></circle>
+    <circle cx="172" cy="150" r="4" fill="oklch(0.62 0.14 245)" style="${twinkleB}"></circle>
+    <circle cx="40" cy="168" r="3.5" fill="oklch(0.62 0.14 245)" style="${twinkleB}"></circle>
+  </g>
+  <g display="${pShow.bubble}">
+    <rect x="6" y="44" width="72" height="30" rx="12" fill="#fff" style="stroke:#1f1d1a;stroke-width:2.5"></rect>
+    <text x="42" y="64" font-size="13" font-weight="800" fill="#1f1d1a" style="text-anchor:middle">blah blah</text>
+  </g>
+  <g display="${pShow.confetti}">
+    <circle cx="28" cy="40" r="5" fill="oklch(0.7 0.12 180)"></circle>
+    <rect x="160" y="30" width="9" height="9" rx="2" fill="oklch(0.54 0.16 275)" transform="rotate(20 164 34)"></rect>
+    <circle cx="176" cy="92" r="4" fill="oklch(0.68 0.17 275)"></circle>
+    <rect x="14" y="100" width="8" height="8" rx="2" fill="oklch(0.82 0.08 275)" transform="rotate(-25 18 104)"></rect>
+    <circle cx="150" cy="10" r="3.5" fill="oklch(0.82 0.08 275)"></circle>
+  </g>
+</svg>`;
+}
+function prefersReducedMotion(){
+  return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function beatEl(mood,size){
+  return renderBeatSVG(mood,size,!prefersReducedMotion());
+}
 
 // ── NOTIFICATIONS ──
 function checkNotif(){
@@ -625,43 +962,43 @@ function chime(hi=false){
 
 // ── ACTIVITIES ──
 const ACTS=[
-  {e:'💪',t:'10 squats'},{e:'🚶',t:'Walk 2 minutes'},
-  {e:'🧘',t:'Eyes closed, breathe'},{e:'💧',t:'Full glass of water'},
-  {e:'☕',t:'Make a warm drink'},{e:'🌬️',t:'5 deep breaths'},
-  {e:'🤸',t:'Roll your shoulders'},{e:'🚪',t:'Step outside, 60 sec'},
-  {e:'🧼',t:'Splash cold water'},{e:'🎵',t:'Listen to one song'},
-  {e:'👁️',t:'Look far away'},{e:'📱',t:'Text someone nice'},
-  {e:'😴',t:'Rest your eyes'},{e:'🏃',t:'5 jumping jacks'},
-  {e:'🌿',t:'Sit in silence'},{e:'🤲',t:'Stretch your wrists'},
+  {t:'10 squats',mood:'squat'},{t:'Walk 2 minutes',mood:'walk'},
+  {t:'Eyes closed, breathe',mood:'breathe'},{t:'Full glass of water',mood:'water'},
+  {t:'Make a warm drink',mood:'drink'},{t:'5 deep breaths',mood:'deepbreath'},
+  {t:'Roll your shoulders',mood:'shoulders'},{t:'Step outside, 60 sec',mood:'outside'},
+  {t:'Splash cold water',mood:'splash'},{t:'Listen to one song',mood:'song'},
+  {t:'Look far away',mood:'look'},{t:'Text someone nice',mood:'text'},
+  {t:'Rest your eyes',mood:'rest'},{t:'5 jumping jacks',mood:'jacks'},
+  {t:'Sit in silence',mood:'silence'},{t:'Stretch your wrists',mood:'wrists'},
 ];
 const UNHINGED=[
-  {e:'😱',t:'Scream into a pillow'},{e:'🕺',t:'Robot dance, now'},
-  {e:'🪞',t:'Compliment yourself'},{e:'🫠',t:'Stare at ceiling'},
-  {e:'💃',t:'Dance, full send'},{e:'😤',t:'Power pose, 30 sec'},
-  {e:'👀',t:'Find 5 blue things'},{e:'🫂',t:'Hug yourself'},
-  {e:'🐟',t:'Flop on the floor'},{e:'🤌',t:'Narrate life in accent'},
+  {t:'Scream into a pillow',mood:'scream'},{t:'Robot dance, now',mood:'robot'},
+  {t:'Compliment yourself',mood:'compliment'},{t:'Stare at ceiling',mood:'ceiling'},
+  {t:'Dance, full send',mood:'dance'},{t:'Power pose, 30 sec',mood:'power'},
+  {t:'Find 5 blue things',mood:'blue'},{t:'Hug yourself',mood:'hug'},
+  {t:'Flop on the floor',mood:'flop'},{t:'Narrate life in accent',mood:'accent'},
 ];
-let selectedActivity=null;
+let selectedActivity=null,selectedMood=null;
 function getActs(){
-  const normal=[...ACTS].sort(()=>Math.random()-0.5).slice(0,3);
+  const normal=[...ACTS].sort(()=>Math.random()-0.5).slice(0,3).map(a=>({...a,wild:false}));
   const wild=UNHINGED[Math.floor(Math.random()*UNHINGED.length)];
-  const all=[...normal];all.splice(Math.floor(Math.random()*4),0,wild);
+  const all=[...normal];all.splice(Math.floor(Math.random()*4),0,{...wild,wild:true});
   return all.slice(0,4);
 }
 function renderActs(){
-  selectedActivity=null;
+  selectedActivity=null;selectedMood=null;
   document.getElementById('break-acts').innerHTML=getActs().map((a,i)=>`
-    <div class="act-card" id="act-${i}" onclick="pickAct(${i},'${a.t}')">
-      <span class="act-emoji">${a.e}</span>
+    <div class="act-card ${a.wild?'wild':''}" id="act-${i}" onclick="pickAct(${i},'${a.t}','${a.mood}')">
+      <div class="act-tile">${beatEl(a.mood,64)}</div>
       <span class="act-text">${a.t}</span>
     </div>`).join('');
 }
-function pickAct(i,t){
+function pickAct(i,t,mood){
   document.querySelectorAll('.act-card').forEach((c,j)=>{
     c.classList.toggle('picked',j===i);
     c.classList.toggle('dimmed',j!==i);
   });
-  selectedActivity=t;
+  selectedActivity=t;selectedMood=mood;
 }
 
 // ── DRAG & DROP ──
@@ -693,7 +1030,7 @@ function onTouchStart(e,i){
   tEl=e.currentTarget.closest('.task-card');
   const r=tEl.getBoundingClientRect();tOffY=e.touches[0].clientY-r.top;
   tClone=tEl.cloneNode(true);
-  tClone.style.cssText=`position:fixed;left:${r.left}px;width:${r.width}px;opacity:0.85;z-index:999;pointer-events:none;border-radius:14px;background:var(--surf);border:1px solid rgba(56,189,248,0.4);`;
+  tClone.style.cssText=`position:fixed;left:${r.left}px;width:${r.width}px;opacity:0.85;z-index:999;pointer-events:none;border-radius:14px;background:var(--surf);border:1px solid var(--cyan);`;
   document.body.appendChild(tClone);tEl.style.opacity='0.3';
 }
 function onTouchMove(e){
@@ -758,7 +1095,7 @@ function renderTasks(){
       </div>`;
     }
     if(i===taskIdx&&inSession){
-      return `<div class="task-card" style="border-color:rgba(56,189,248,0.3);background:var(--cdim);margin-bottom:0.5rem;">
+      return `<div class="task-card" style="border-color:var(--cyan);background:var(--cdim);margin-bottom:0.5rem;">
         <div class="task-row">
           <span style="font-family:var(--mono);font-size:0.62rem;color:var(--cyan);flex-shrink:0;">NOW</span>
           <span style="flex:1;font-size:0.88rem;color:var(--text);padding-left:0.5rem;">${t.name}</span>
@@ -888,6 +1225,7 @@ function renderPanel(){
 
 function showCheckIn(){
   show('s-checkin');
+  document.getElementById('ci-beat').innerHTML=beatEl(selectedMood||'rest',230);
   const txt=document.getElementById('ci-text');
   if(selectedActivity){
     txt.className='checkin-activity';
@@ -941,6 +1279,7 @@ function resumeSession(){
 function confirmReset(){if(confirm('Reset everything?'))resetAll();}
 function showDone(){
   clearInterval(tmr);clearInterval(skipTmr);show('s-done');
+  document.getElementById('done-beat').innerHTML=beatEl('cele',180);
   document.getElementById('ds-t').textContent=done;
   document.getElementById('ds-m').textContent=focMin;
   document.getElementById('ds-h').textContent=honest;
@@ -951,7 +1290,7 @@ function showDone(){
 }
 function resetAll(){
   clearInterval(tmr);clearInterval(skipTmr);clearInterval(reminderTmr);
-  tasks=[];taskIdx=0;done=0;focMin=0;honest=0;streak=0;maxStreak=0;paused=false;secsLeft=0;totalSecs=0;selectedActivity=null;
+  tasks=[];taskIdx=0;done=0;focMin=0;honest=0;streak=0;maxStreak=0;paused=false;secsLeft=0;totalSecs=0;selectedActivity=null;selectedMood=null;
   const btn=document.getElementById('go-btn');btn.onclick=startSession;btn.textContent="Let's go";btn.disabled=true;
   renderTasks();updateGoBtn();show('s-setup');
 }
@@ -964,6 +1303,8 @@ function show(id){
   setTimeout(()=>el.classList.remove('fade'),400);
 }
 
+document.getElementById('setup-beat').innerHTML=beatEl('idle',100);
+document.getElementById('focus-beat').innerHTML=beatEl('focus',70);
 checkNotif();addTask();
 </script>
 </body>
