@@ -170,7 +170,7 @@ main{
 .display-h em{font-style:italic;}
 .display-h.amber em{font-style:italic;color:var(--amber-text);}
 .display-h.xl{font-size:clamp(2.4rem,7vw,5rem);}
-.display-h.xxl{font-size:clamp(2.6rem,8vw,5.5rem);}
+.display-h.compact{font-size:clamp(1.8rem,5vw,3.5rem);white-space:normal;}
 
 /* Timer */
 .big-timer{
@@ -180,6 +180,7 @@ main{
   line-height:1;margin-bottom:0.75rem;
   text-align:center;
 }
+.big-timer.compact{font-size:clamp(2.5rem,9vw,6rem);}
 .big-timer.c{color:var(--cyan);}
 .big-timer.a{color:var(--amber-text);}
 
@@ -246,19 +247,22 @@ main{
 }
 
 /* ── SETUP ── */
-.notif-strip{
-  display:flex;align-items:center;gap:0.6rem;
-  background:var(--surf);border:1px solid var(--bdr2);
-  border-radius:10px;padding:0.65rem 0.9rem;
-  margin-bottom:1.75rem;
-  font-size:0.8rem;color:var(--dim);
+.nudge-row{
+  display:flex;align-items:center;justify-content:center;gap:0.6rem;
+  width:100%;margin-top:0.9rem;font-size:0.85rem;color:var(--mid);cursor:pointer;
 }
-.notif-strip.denied{background:color-mix(in srgb,var(--red) 8%,transparent);border-color:color-mix(in srgb,var(--red) 25%,transparent);color:var(--red);}
-#notif-btn{
-  margin-left:auto;background:var(--cyan);color:var(--ink-on-primary);
-  border:none;border-radius:20px;padding:0.22rem 0.7rem;
-  font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;
+.nudge-toggle{
+  width:34px;height:20px;border-radius:999px;background:var(--bdr2);
+  padding:2px;box-sizing:border-box;display:flex;flex-shrink:0;
+  transition:background 0.2s;
 }
+.nudge-toggle.on{background:var(--cyan);}
+.nudge-toggle.denied{opacity:0.4;cursor:not-allowed;}
+.nudge-dot{
+  width:16px;height:16px;border-radius:50%;background:var(--text);
+  transition:transform 0.2s;
+}
+.nudge-toggle.on .nudge-dot{transform:translateX(14px);background:var(--ink-on-primary);}
 
 
 .setup-grid{
@@ -368,17 +372,17 @@ main{
 .upnext-more{font-family:var(--mono);font-size:0.75rem;color:var(--dim);flex-shrink:0;}
 
 /* ── BREAK ── */
-.break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:0.5rem;width:100%;max-width:780px;margin:0 auto;}
+.break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:0.5rem;width:100%;max-width:640px;margin:0 auto;}
 .act-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:1rem;width:100%;margin-bottom:1.5rem;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0.9rem;width:100%;margin-bottom:1.25rem;
 }
 .act-card{
   background:var(--card);border:1.5px solid var(--bdr);
-  border-radius:22px;padding:1.1rem;
+  border-radius:18px;padding:0.7rem 0.6rem 0.9rem;
   cursor:pointer;transition:all 0.18s;
-  display:flex;align-items:center;gap:1.1rem;
-  text-align:left;
+  display:flex;flex-direction:column;align-items:center;gap:0.55rem;
+  text-align:center;
 }
 .act-card:hover{border-color:var(--amber);}
 .act-card.picked{border-color:var(--amber);background:var(--adim);}
@@ -387,12 +391,15 @@ main{
 .act-card.wild:hover{border-color:var(--cyan);}
 .act-card.wild.picked{border-color:var(--cyan);background:var(--wild-fill);}
 .act-tile{
-  width:110px;height:110px;border-radius:18px;background:var(--tile);
+  width:100%;height:88px;border-radius:14px;background:var(--tile);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
   overflow:hidden;
 }
 .act-card.wild .act-tile{background:var(--surf);}
-.act-text{font-size:1.3rem;color:var(--text);font-weight:700;line-height:1.3;}
+@media(max-width:600px){
+  .act-grid{grid-template-columns:repeat(2,1fr);}
+}
+.act-text{font-size:0.9rem;color:var(--text);font-weight:700;line-height:1.25;}
 
 .skip-link{
   margin-top:1rem;
@@ -499,13 +506,6 @@ main{
 <!-- ══ SETUP ══ -->
 <div class="screen active" id="s-setup">
 
-  <!-- Only show when blocked -->
-  <div id="notif-strip" style="display:none;" class="notif-strip">
-    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-    <span id="notif-msg">Enable notifications</span>
-    <button id="notif-btn" onclick="reqNotif()">Enable</button>
-  </div>
-
   <div class="setup-grid">
     <div class="setup-left">
       <div class="subtle-label">Work at your tempo.</div>
@@ -526,6 +526,10 @@ main{
       </div>
 
       <button class="btn primary" id="go-btn" onclick="startSession()" disabled>Let's go</button>
+      <div class="nudge-row" id="nudge-row" onclick="toggleNudge()">
+        <div class="nudge-toggle" id="nudge-toggle"><div class="nudge-dot"></div></div>
+        Nudge me when time's up
+      </div>
     </div>
     <div class="setup-right">
       <div class="bubble">Drop the first task, let's jam!</div>
@@ -589,10 +593,10 @@ main{
       <span class="eyebrow-dot"></span>
       Pause.
     </div>
-    <h2 class="display-h amber xxl" style="text-align:center;margin-bottom:0.5rem;">
-      Good work.<br><em>Take a breather.</em>
+    <h2 class="display-h amber compact" style="text-align:center;margin-bottom:0.5rem;">
+      Good work. <em>Take a breather.</em>
     </h2>
-    <div class="big-timer a" id="b-timer">05:00</div>
+    <div class="big-timer a compact" id="b-timer">05:00</div>
     <div class="prog"><div class="prog-fill a" id="b-prog"></div></div>
     <div class="act-grid" id="break-acts"></div>
     <div class="skip-link" id="skip-btn" onclick="skipBreak()">Skip (available in 2:00)</div>
@@ -911,23 +915,34 @@ function beatEl(mood,size){
 }
 
 // ── NOTIFICATIONS ──
-function checkNotif(){
-  const strip=document.getElementById('notif-strip');
-  const msg=document.getElementById('notif-msg');
-  if(!('Notification' in window)){strip.style.display='none';return;}
-  if(Notification.permission==='granted'){
-    strip.style.display='none'; // hide when on — don't celebrate obvious
-  } else if(Notification.permission==='denied'){
-    strip.style.display='flex';strip.className='notif-strip denied';
-    msg.textContent='Notifications blocked — re-enable in browser settings';
-    document.getElementById('notif-btn').style.display='none';
-  } else {
-    strip.style.display='flex'; // show prompt only when pending
-    msg.textContent='Enable notifications to get nudged when time\'s up';
-  }
+let nudgePref=true;
+function initNudge(){
+  if(!('Notification' in window)){document.getElementById('nudge-row').style.display='none';return;}
+  try{const saved=localStorage.getItem('tempo-nudge');if(saved!==null)nudgePref=saved==='1';}catch(e){}
+  updateNudgeUI();
 }
-function reqNotif(){Notification.requestPermission().then(()=>checkNotif());}
-function notify(t,b){if('Notification' in window&&Notification.permission==='granted')new Notification(t,{body:b});}
+function updateNudgeUI(){
+  const track=document.getElementById('nudge-toggle');
+  const denied=Notification.permission==='denied';
+  track.classList.toggle('on',nudgePref&&Notification.permission==='granted'&&!denied);
+  track.classList.toggle('denied',denied);
+  track.title=denied?'Blocked — re-enable notifications in your browser settings':'';
+}
+function toggleNudge(){
+  if(Notification.permission==='denied')return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{
+      nudgePref=p==='granted';
+      try{localStorage.setItem('tempo-nudge',nudgePref?'1':'0');}catch(e){}
+      updateNudgeUI();
+    });
+    return;
+  }
+  nudgePref=!nudgePref;
+  try{localStorage.setItem('tempo-nudge',nudgePref?'1':'0');}catch(e){}
+  updateNudgeUI();
+}
+function notify(t,b){if('Notification' in window&&Notification.permission==='granted'&&nudgePref)new Notification(t,{body:b});}
 
 // ── AUDIO ──
 let aCtx=null;
@@ -986,7 +1001,7 @@ function renderActs(){
   selectedActivity=null;selectedMood=null;
   document.getElementById('break-acts').innerHTML=getActs().map((a,i)=>`
     <div class="act-card ${a.wild?'wild':''}" id="act-${i}" onclick="pickAct(${i},'${a.t}','${a.mood}')">
-      <div class="act-tile">${beatEl(a.mood,100)}</div>
+      <div class="act-tile">${beatEl(a.mood,74)}</div>
       <span class="act-text">${a.t}</span>
     </div>`).join('');
 }
@@ -1305,7 +1320,7 @@ function show(id){
 
 document.getElementById('setup-beat').innerHTML=beatEl('idle',220);
 document.getElementById('focus-beat').innerHTML=beatEl('focus',120);
-checkNotif();addTask();
+initNudge();addTask();
 </script>
 </body>
 </html>
