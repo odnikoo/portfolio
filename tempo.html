@@ -32,6 +32,7 @@
   --cdim:   oklch(0.68 0.17 275 / 0.12);
   --cglow:  oklch(0.68 0.17 275 / 0.35);
   --cyan-dark: oklch(0.54 0.16 275);
+  --cyan-label: oklch(0.8 0.1 275);
   --amber:  oklch(0.68 0.17 45);
   --adim:   oklch(0.68 0.17 45 / 0.12);
   --amber-label: oklch(0.78 0.14 50);
@@ -58,6 +59,7 @@
   --bdr2:   oklch(0.9 0.025 290);
   --cdim:   oklch(0.68 0.17 275 / 0.10);
   --cglow:  oklch(0.68 0.17 275 / 0.30);
+  --cyan-label: var(--cyan-dark);
   --adim:   oklch(0.68 0.17 45 / 0.08);
   --amber-label: oklch(0.56 0.16 45);
   --amber-text: oklch(0.62 0.17 45);
@@ -138,7 +140,7 @@ main{
   font-family:var(--sans);font-size:0.8rem;font-weight:600;
   margin-bottom:0.85rem;justify-content:center;
 }
-.eyebrow.c{color:var(--cyan);}
+.eyebrow.c{color:var(--cyan-label);}
 .eyebrow.a{color:var(--amber-label);}
 .eyebrow.g{color:var(--green);}
 .eyebrow-dot{
@@ -159,7 +161,7 @@ main{
 
 .display-h{
   font-family:var(--serif);
-  font-size:clamp(2.1rem,5.5vw,2.9rem);
+  font-size:clamp(2.2rem,6vw,4.5rem);
   font-weight:400;letter-spacing:-0.01em;
   line-height:1.02;color:var(--text);
   margin-bottom:0.5rem;
@@ -167,17 +169,19 @@ main{
 }
 .display-h em{font-style:italic;}
 .display-h.amber em{font-style:italic;color:var(--amber-text);}
+.display-h.xl{font-size:clamp(2.4rem,7vw,5rem);}
+.display-h.xxl{font-size:clamp(2.6rem,8vw,5.5rem);}
 
 /* Timer */
 .big-timer{
   font-family:var(--mono);
-  font-size:clamp(4.5rem,15vw,6.5rem);
+  font-size:clamp(3.5rem,12vw,8.25rem);
   font-weight:500;letter-spacing:-0.02em;
   line-height:1;margin-bottom:0.75rem;
   text-align:center;
 }
-.big-timer.c{color:var(--cyan);text-shadow:0 0 40px var(--cglow);}
-.big-timer.a{color:var(--amber-text);text-shadow:0 0 40px var(--adim);}
+.big-timer.c{color:var(--cyan);}
+.big-timer.a{color:var(--amber-text);}
 
 /* Progress */
 .prog{
@@ -193,11 +197,23 @@ main{
 
 /* Task name on focus screen */
 .task-label{
-  font-family:var(--sans);font-size:0.88rem;
-  color:var(--dim);text-align:center;
-  margin-bottom:1.25rem;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:var(--sans);font-size:1.25rem;
+  color:var(--text);opacity:0.75;text-align:center;
+  margin-bottom:1.5rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
 }
+
+/* Contextual screen header (Focus/Break) */
+.screen-header{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;margin-bottom:1.5rem;
+}
+.header-link{
+  font-family:var(--sans);font-size:0.85rem;color:var(--mid);
+  cursor:pointer;transition:color 0.15s;white-space:nowrap;
+}
+.header-link:hover{color:var(--text);}
+.screen-header.end{justify-content:flex-end;}
 
 /* Buttons */
 .btns{display:flex;flex-direction:column;gap:0.5rem;width:100%;}
@@ -331,65 +347,37 @@ main{
 
 /* ── FOCUS SCREEN ── */
 .focus-wrap{display:flex;flex-direction:column;align-items:center;width:100%;max-width:560px;margin:0 auto;}
-.focus-ctrls{
-  display:flex;flex-direction:column;gap:0.45rem;
-  width:100%;max-width:360px;
+.focus-pause-btn{max-width:240px;}
+.text-link-row{
+  display:flex;gap:1.75rem;margin-top:0.9rem;
 }
-.focus-ctrls-row{display:flex;gap:0.45rem;}
-.focus-ctrls-row .btn{flex:1;}
+.text-link{
+  font-family:var(--sans);font-size:0.9rem;font-weight:600;
+  color:var(--mid);cursor:pointer;transition:color 0.15s;
+}
+.text-link:hover{color:var(--text);}
 
-/* Task panel */
-.task-panel{
-  width:100%;background:var(--bg2);
-  border:1px solid var(--bdr);border-radius:14px;
-  overflow:hidden;margin-top:2rem;
-}
-.task-panel-head{
-  padding:0.8rem 1rem;
-  border-bottom:1px solid var(--bdr);
-  display:flex;justify-content:space-between;align-items:center;
-}
-.tph-l{font-size:0.8rem;font-weight:600;color:var(--dim);}
-.tph-r{font-family:var(--mono);font-size:0.75rem;color:var(--cyan);}
-.tpanel-items{display:flex;flex-wrap:wrap;}
-.tpanel-item{
+/* Up next pill */
+.upnext-pill{
   display:flex;align-items:center;gap:0.6rem;
-  padding:0.8rem 1rem;
-  border-right:1px solid var(--bdr);
-  border-bottom:1px solid var(--bdr);
-  flex:1;min-width:140px;transition:background 0.15s;
+  margin-top:1.5rem;padding:0.6rem 1rem;
+  border-radius:999px;background:var(--card);border:1px solid var(--bdr);
+  font-size:0.85rem;color:var(--text);white-space:nowrap;max-width:100%;overflow:hidden;
 }
-.tpanel-item.cur{background:var(--cdim);}
-.tpanel-item.done{opacity:0.3;}
-.tpdot{
-  width:7px;height:7px;border-radius:50%;
-  border:1.5px solid var(--dim);flex-shrink:0;
-}
-.tpanel-item.cur .tpdot{
-  border-color:var(--cyan);background:var(--cyan);
-  animation:throb 1.5s infinite;
-}
-.tpanel-item.done .tpdot{border-color:var(--green);background:var(--green);}
-@keyframes throb{
-  0%,100%{box-shadow:0 0 0 0 var(--cglow);}
-  50%{box-shadow:0 0 0 4px transparent;}
-}
-.tpname{font-size:0.85rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
-.tpanel-item.done .tpname{text-decoration:line-through;color:var(--dim);}
-.tpmins{font-family:var(--mono);font-size:0.7rem;color:var(--dim);flex-shrink:0;}
-.tpanel-item.cur .tpmins{color:var(--cyan);}
+.upnext-label{color:var(--dim);flex-shrink:0;}
+.upnext-more{font-family:var(--mono);font-size:0.75rem;color:var(--dim);flex-shrink:0;}
 
 /* ── BREAK ── */
-.break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1rem;width:100%;max-width:560px;margin:0 auto;}
+.break-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:0.5rem;width:100%;max-width:780px;margin:0 auto;}
 .act-grid{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:0.6rem;width:100%;margin-bottom:2rem;
+  gap:1rem;width:100%;margin-bottom:1.5rem;
 }
 .act-card{
   background:var(--card);border:1.5px solid var(--bdr);
-  border-radius:20px;padding:0.9rem;
+  border-radius:22px;padding:1.1rem;
   cursor:pointer;transition:all 0.18s;
-  display:flex;align-items:center;gap:0.7rem;
+  display:flex;align-items:center;gap:1.1rem;
   text-align:left;
 }
 .act-card:hover{border-color:var(--amber);}
@@ -399,36 +387,34 @@ main{
 .act-card.wild:hover{border-color:var(--cyan);}
 .act-card.wild.picked{border-color:var(--cyan);background:var(--wild-fill);}
 .act-tile{
-  width:84px;height:84px;border-radius:16px;background:var(--tile);
+  width:110px;height:110px;border-radius:18px;background:var(--tile);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
   overflow:hidden;
 }
 .act-card.wild .act-tile{background:var(--surf);}
-.act-text{font-size:0.85rem;color:var(--text);font-weight:700;line-height:1.3;}
+.act-text{font-size:1.3rem;color:var(--text);font-weight:700;line-height:1.3;}
 
-.skip-section{display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:300px;}
-.skip-btn{
-  width:100%;padding:0.7rem;border-radius:12px;
-  border:1px solid var(--bdr2);background:var(--surf);
-  font-family:var(--sans);font-size:0.82rem;color:var(--dim);
-  cursor:pointer;transition:all 0.18s;
+.skip-link{
+  margin-top:1rem;
+  font-family:var(--sans);font-size:0.9rem;font-weight:600;color:var(--dim);
+  cursor:not-allowed;transition:color 0.18s;
 }
-.skip-btn:not(:disabled):hover{color:var(--amber-text);border-color:var(--amber);}
-.skip-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.skip-link.ready{color:var(--mid);cursor:pointer;}
+.skip-link.ready:hover{color:var(--amber-text);}
 
 /* ── CHECK-IN ── */
 .checkin-wrap{
   display:flex;flex-direction:column;
   align-items:center;text-align:center;
-  padding-top:1rem;width:100%;max-width:560px;margin:0 auto;
+  padding-top:1rem;width:100%;max-width:680px;margin:0 auto;
 }
 .checkin-activity{
   font-family:var(--serif);font-style:italic;
-  font-size:clamp(1.9rem,5vw,2.6rem);
+  font-size:clamp(2rem,7vw,4.75rem);
   font-weight:400;letter-spacing:-0.01em;
   line-height:1.05;color:var(--amber-text);
   margin-bottom:2rem;
-  max-width:400px;
+  max-width:600px;
 }
 .checkin-activity.generic{color:var(--text);font-style:normal;}
 
@@ -483,8 +469,6 @@ main{
 
 /* ── RESPONSIVE ── */
 @media(max-width:480px){
-  .big-timer{font-size:4rem;}
-  .tpanel-item{min-width:100%;border-right:none;}
   .stats{grid-template-columns:repeat(2,1fr);max-width:100%;}
 }
 @media(max-width:360px){
@@ -552,32 +536,30 @@ main{
 
 <!-- ══ FOCUS ══ -->
 <div class="screen" id="s-focus">
-  <div class="focus-wrap" style="padding-top:1.5rem;">
+  <div class="focus-wrap">
+    <div class="screen-header">
+      <span class="header-link" onclick="goBack()">← Edit tasks</span>
+      <span class="header-link" onclick="confirmReset()">↩ Reset</span>
+    </div>
     <div class="eyebrow c">
       <span class="eyebrow-dot"></span>
       Focusing
     </div>
     <div id="focus-beat" style="margin-bottom:0.5rem;"></div>
-    <div class="big-timer c" id="f-timer">25 : 00</div>
+    <div class="big-timer c" id="f-timer">25:00</div>
     <div class="prog"><div class="prog-fill c" id="f-prog"></div></div>
     <p class="task-label" id="f-label"></p>
 
-    <div class="focus-ctrls">
-      <div class="focus-ctrls-row">
-        <button class="btn primary" id="pause-btn" onclick="togglePause()">Pause</button>
-        <button class="btn ghost" onclick="addMin()">+1 min</button>
-        <button class="btn ghost" onclick="doneEarly()">Done early</button>
-      </div>
-      <button class="btn ghost" onclick="goBack()">← Add more tasks</button>
-      <button class="btn faint" onclick="confirmReset()">↩ Reset</button>
+    <button class="btn primary focus-pause-btn" id="pause-btn" onclick="togglePause()">Pause</button>
+    <div class="text-link-row">
+      <span class="text-link" onclick="addMin()">+1 min</span>
+      <span class="text-link" onclick="doneEarly()">Done early</span>
     </div>
 
-    <div class="task-panel">
-      <div class="task-panel-head">
-        <span class="tph-l">Tasks</span>
-        <span class="tph-r" id="f-count">0/0</span>
-      </div>
-      <div class="tpanel-items" id="f-tasks"></div>
+    <div class="upnext-pill" id="up-next" style="display:none;">
+      <span class="upnext-label">Up next</span>
+      <span id="upnext-name"></span>
+      <span class="upnext-more" id="upnext-more"></span>
     </div>
   </div>
 </div>
@@ -600,20 +582,20 @@ main{
 <!-- ══ BREAK ══ -->
 <div class="screen" id="s-break">
   <div class="break-wrap">
+    <div class="screen-header end">
+      <span class="header-link" onclick="confirmReset()">↩ Reset</span>
+    </div>
     <div class="eyebrow a" style="justify-content:center;">
       <span class="eyebrow-dot"></span>
       Pause.
     </div>
-    <h2 class="display-h amber" style="text-align:center;margin-bottom:0.5rem;">
+    <h2 class="display-h amber xxl" style="text-align:center;margin-bottom:0.5rem;">
       Good work.<br><em>Take a breather.</em>
     </h2>
-    <div class="big-timer a" id="b-timer">05 : 00</div>
+    <div class="big-timer a" id="b-timer">05:00</div>
     <div class="prog"><div class="prog-fill a" id="b-prog"></div></div>
     <div class="act-grid" id="break-acts"></div>
-    <div class="skip-section">
-      <button class="skip-btn" id="skip-btn" onclick="skipBreak()" disabled>Skip (available in 2:00)</button>
-      <button class="btn faint" onclick="confirmReset()" style="font-size:0.8rem;padding:0.6rem;">↩ Reset</button>
-    </div>
+    <div class="skip-link" id="skip-btn" onclick="skipBreak()">Skip (available in 2:00)</div>
   </div>
 </div>
 
@@ -1004,7 +986,7 @@ function renderActs(){
   selectedActivity=null;selectedMood=null;
   document.getElementById('break-acts').innerHTML=getActs().map((a,i)=>`
     <div class="act-card ${a.wild?'wild':''}" id="act-${i}" onclick="pickAct(${i},'${a.t}','${a.mood}')">
-      <div class="act-tile">${beatEl(a.mood,76)}</div>
+      <div class="act-tile">${beatEl(a.mood,100)}</div>
       <span class="act-text">${a.t}</span>
     </div>`).join('');
 }
@@ -1170,7 +1152,7 @@ function startFocus(){
   totalSecs=task.focus*60;secsLeft=totalSecs;focMin+=task.focus;
   endAt=Date.now()+totalSecs*1000;
   document.getElementById('f-prog').style.width='100%';
-  updateFocusUI();renderPanel();
+  updateFocusUI();
   clearInterval(tmr);
   tmr=setInterval(()=>{
     if(!paused){secsLeft=Math.max(0,Math.round((endAt-Date.now())/1000));updateFocusUI();}
@@ -1204,17 +1186,17 @@ function startBreak(){
   let ss=Math.min(120,breakMins*60);
   const skipEndAt=Date.now()+ss*1000;
   const sb=document.getElementById('skip-btn');
-  sb.disabled=true;sb.textContent=`Skip (available in ${fmt(ss)})`;
+  sb.classList.remove('ready');sb.textContent=`Skip (available in ${fmt(ss)})`;
   clearInterval(skipTmr);
   skipTmr=setInterval(()=>{
     ss=Math.max(0,Math.round((skipEndAt-Date.now())/1000));
-    if(ss<=0){clearInterval(skipTmr);sb.disabled=false;sb.textContent='Skip rest →';}
+    if(ss<=0){clearInterval(skipTmr);sb.classList.add('ready');sb.textContent='Skip rest →';}
     else sb.textContent=`Skip (available in ${fmt(ss)})`;
   },1000);
   clearInterval(tmr);
   tmr=setInterval(()=>{
     secsLeft=Math.max(0,Math.round((breakEndAt-Date.now())/1000));
-    document.getElementById('b-timer').textContent=fmtS(secsLeft);
+    document.getElementById('b-timer').textContent=fmt(secsLeft);
     document.getElementById('b-prog').style.width=`${(secsLeft/totalSecs)*100}%`;
     if(secsLeft<=0){clearInterval(tmr);clearInterval(skipTmr);chime(true);notify('Rest over','How was it?');showCheckIn();}
   },1000);
@@ -1223,19 +1205,19 @@ function startBreak(){
 function finishTask(){done++;taskIdx++;if(taskIdx>=tasks.length)showDone();else startBreak();}
 
 function updateFocusUI(){
-  document.getElementById('f-timer').textContent=fmtS(secsLeft);
+  document.getElementById('f-timer').textContent=fmt(secsLeft);
   document.getElementById('f-prog').style.width=`${(secsLeft/totalSecs)*100}%`;
-  renderPanel();
+  renderUpNext();
 }
 
-function renderPanel(){
-  document.getElementById('f-count').textContent=`${done}/${tasks.length}`;
-  document.getElementById('f-tasks').innerHTML=tasks.map((t,i)=>`
-    <div class="tpanel-item ${i<taskIdx?'done':''} ${i===taskIdx?'cur':''}">
-      <div class="tpdot"></div>
-      <span class="tpname">${t.name}</span>
-      <span class="tpmins">${t.focus}m</span>
-    </div>`).join('');
+function renderUpNext(){
+  const pill=document.getElementById('up-next');
+  const next=tasks[taskIdx+1];
+  if(!next){pill.style.display='none';return;}
+  pill.style.display='flex';
+  document.getElementById('upnext-name').textContent=next.name;
+  const more=tasks.length-taskIdx-2;
+  document.getElementById('upnext-more').textContent=more>0?`+${more} more`:'';
 }
 
 function showCheckIn(){
@@ -1247,10 +1229,10 @@ function showCheckIn(){
     txt.textContent=selectedActivity+'?';
   } else {
     txt.className='checkin-activity generic';
-    txt.textContent='How was the rest?';
+    txt.textContent='Did you actually rest?';
   }
-  document.getElementById('ci-yes').textContent=selectedActivity?'✓ Did it':'✓ Stayed off';
-  document.getElementById('ci-no').textContent='Nope';
+  document.getElementById('ci-yes').textContent=selectedActivity?'✓ Did it':'✓ Yes, I rested';
+  document.getElementById('ci-no').textContent='Not really';
 }
 
 function selectCheckIn(ok){
@@ -1266,7 +1248,10 @@ function togglePause(){
 }
 function addMin(){endAt+=60000;totalSecs+=60;secsLeft+=60;updateFocusUI();}
 function doneEarly(){clearInterval(tmr);chime(false);finishTask();}
-function skipBreak(){clearInterval(tmr);clearInterval(skipTmr);showCheckIn();}
+function skipBreak(){
+  if(!document.getElementById('skip-btn').classList.contains('ready'))return;
+  clearInterval(tmr);clearInterval(skipTmr);showCheckIn();
+}
 
 function goBack(){
   clearInterval(tmr);clearInterval(skipTmr);clearInterval(reminderTmr);paused=true;
@@ -1282,7 +1267,7 @@ function resumeSession(){
   document.getElementById('pause-btn').textContent='Pause';
   document.getElementById('f-label').textContent=tasks[taskIdx].name;
   endAt=Date.now()+secsLeft*1000;
-  updateFocusUI();renderPanel();
+  updateFocusUI();
   clearInterval(tmr);
   const task=tasks[taskIdx];
   tmr=setInterval(()=>{
@@ -1319,7 +1304,7 @@ function show(id){
 }
 
 document.getElementById('setup-beat').innerHTML=beatEl('idle',220);
-document.getElementById('focus-beat').innerHTML=beatEl('focus',70);
+document.getElementById('focus-beat').innerHTML=beatEl('focus',120);
 checkNotif();addTask();
 </script>
 </body>
